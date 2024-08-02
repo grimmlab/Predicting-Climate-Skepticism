@@ -18,7 +18,7 @@ import torch
 
 
 target_column = "climatedeniers_1"
-dataset = "../Datasets/dataset_preprocessed.csv"
+dataset = "Datasets/dataset_preprocessed.csv"
 
 class ClimateDeniersClassifier:
 
@@ -235,11 +235,11 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-dc', '--drop_columns', nargs='*', help='Define columns to drop.', required=True)
+    parser.add_argument('-tbdc', '--to_be_dropped_columns', nargs='*', help='Define columns to drop.', required=True)
 
     args = parser.parse_args()
 
-    to_be_dropped_columns = args.drop_columns
+    to_be_dropped_columns = args.to_be_dropped_columns
 
     climate_deniers_classifier = ClimateDeniersClassifier()
     climate_deniers_classifier.run_pipeline()
