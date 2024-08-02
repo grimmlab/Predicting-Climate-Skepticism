@@ -1,0 +1,13 @@
+sampling,over
+sampling_strategy,not minority
+impute,True
+n_layers,1
+act_function,tanh
+n_initial_units_factor,0.25
+dropout,0.1
+perc_decrease_per_layer,0.1
+batch_norm,True
+batch_size,512
+n_epochs,2
+learning_rate,0.001
+early_stopping_patience,100
