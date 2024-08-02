@@ -105,7 +105,6 @@ class ClimateDeniersClassifier:
             colsample_bytree=colsample_bytree,
             max_leaves=max_leaves,
             objective=objective,
-            device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
             enable_categorical=True,
         )
 
