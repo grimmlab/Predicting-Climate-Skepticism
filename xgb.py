@@ -12,9 +12,8 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report, matthews_corrcoef
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.under_sampling import RandomUnderSampler
-from utils import impute_data, encode_data, get_indexes, drop_columns, run_optuna_optimization
+from utils import impute_data, encode_data, get_indexes, run_optuna_optimization
 import argparse
-import torch
 
 
 target_column = "climatedeniers_1"
@@ -23,18 +22,84 @@ dataset = "Datasets/dataset_preprocessed.csv"
 class ClimateDeniersClassifier:
 
     def preprocess_data(self, impute):
-        data = pd.read_csv(dataset)
+        data = pd.read_csv(
+            dataset,
+            dtype={
+                'LocationLatitude': 'float64', 'LocationLongitude': 'float64', 'gender': 'category', 'age': 'int64',
+                'income': 'category', 'region_1': 'category', 'region_2': 'category', 'region_3': 'category',
+                'plz': 'category', 'education': 'category', 'marital_status': 'category', 'children': 'category',
+                'job': 'category', 'job_field_1': 'category', 'job_field_2': 'category', 'religion': 'category',
+                'religion_practice': 'category', 'migration_b_germany': 'category', 'migration_b_g_city': 'category',
+                'migration_b_g_drill_1': 'category', 'migration_b_g_drill_2': 'category',
+                'migration_b_g_drill_3': 'category', 'migration_s_germany': 'category',
+                'migration_s_g_city': 'category', 'migration_s_g_drill_1': 'category',
+                'migration_s_g_drill_2': 'category', 'migration_s_g_drill_3': 'category',
+                'migration_region': 'category', 'subject_well_being_1': 'float64', 'innovation': 'category',
+                'b_q1_own_opinion': 'category', 'b_q1_point_guess': 'category', 'b_q1_distribution_1': 'int64',
+                'b_q1_distribution_2': 'int64', 'b_q1_distribution_3': 'int64', 'b_q1_distribution_4': 'int64',
+                'b_q1_distribution_5': 'int64', 'b_q2_population': 'category', 'b_q2_point_guess': 'category',
+                'b_q2_distribution_1': 'float64', 'b_q2_distribution_2': 'float64', 'b_q2_distribution_3': 'float64',
+                'b_q2_distribution_4': 'float64', 'b_q2_distribution_5': 'float64', 'e_q1_own_opinion': 'category',
+                'e_q1_point_guess': 'category', 'e_q1_distribution_1': 'float64', 'e_q1_distribution_2': 'float64',
+                'e_q1_distribution_3': 'float64', 'e_q1_distribution_4': 'float64', 'e_q1_distribution_5': 'float64',
+                'e_q2_population': 'category', 'e_q2_point_guess': 'category', 'e_q2_distribution_1': 'float64',
+                'e_q2_distribution_2': 'float64', 'e_q2_distribution_3': 'float64', 'e_q2_distribution_4': 'float64',
+                'e_q2_distribution_5': 'float64', 'GPS_71': 'category', 'GPS_72_A': 'category', 'GPS_72_B': 'category',
+                'GPS_72_C': 'category', 'GPS_72_D': 'category', 'GPS_73_A': 'category', 'GPS_73_B': 'category',
+                'GPS_73_C': 'category', 'GPS_73_D': 'category', 'GPS_73_E': 'category', 'GPS_74': 'category',
+                'GPS_105': 'category', 'GPS_106': 'float64', 'GPS_107': 'category', 'climate_know': 'category',
+                'climate_eb_problem_1': 'float64', 'climate_eb_responsib': 'category',
+                'climate_eb_renewable': 'category', 'climate_eb_efficient': 'category', 'climate_eb_ets': 'category',
+                'climate_eb_statement_1': 'category', 'climate_eb_statement_2': 'category',
+                'climate_eb_statement_3': 'category', 'climate_eb_statement_4': 'category',
+                'climate_eb_statement_5': 'category', 'climate_eb_statement_6': 'category',
+                'climate_flood_affect': 'category', 'climate_risk': 'category', 'climate_statements_1': 'category',
+                'climate_statements_2': 'category', 'climate_statements_3': 'category',
+                'climate_statements_4': 'category', 'climate_statements_5': 'category',
+                'climate_statements_6': 'category', 'climate_statements_7': 'category',
+                'climate_statements_8': 'category', 'climate_statements_9': 'category',
+                'climate_statements_10': 'category', 'climate_statements_11': 'category',
+                'climate_statements_12': 'category', 'climate_statements_13': 'category',
+                'climate_statements_14': 'category', 'climate_statements_15': 'category',
+                'climate_policies_1': 'category', 'climate_policies_2': 'category', 'climate_policies_3': 'category',
+                'climate_policies_4': 'category', 'climate_pol_engage_1': 'category', 'climate_pol_engage_2': 'category',
+                'climate_pol_engage_3': 'category', 'climate_pol_engage_4': 'category',
+                'climate_pol_engage_5': 'category', 'climate_pol_engage_6': 'category',
+                'climate_pol_engage_7': 'category', 'climate_trust_1': 'category', 'climate_trust_2': 'category',
+                'climate_trust_3': 'category', 'climate_trust_4': 'category', 'climate_trust_5': 'category',
+                'climate_trust_6': 'category', 'climate_trust_7': 'category', 'bioecon_products': 'category',
+                'moral_right_wrong_1': 'category', 'moral_right_wrong_2': 'category', 'moral_right_wrong_3': 'category',
+                'moral_right_wrong_4': 'category', 'moral_right_wrong_5': 'category', 'moral_right_wrong_6': 'category',
+                'moral_right_wrong_7': 'category', 'moral_right_wrong_8': 'category', 'moral_right_wrong_9': 'category',
+                'moral_right_wrong_10': 'category', 'moral_right_wrong_11': 'category',
+                'moral_right_wrong_12': 'category', 'moral_right_wrong_13': 'category',
+                'moral_right_wrong_14': 'category', 'moral_right_wrong_15': 'category',
+                'moral_right_wrong_16': 'category', '\xa0moral_statements_1': 'category',
+                '\xa0moral_statements_2': 'category', '\xa0moral_statements_3': 'category',
+                '\xa0moral_statements_4': 'category', '\xa0moral_statements_5': 'category',
+                '\xa0moral_statements_6': 'category', '\xa0moral_statements_7': 'category',
+                '\xa0moral_statements_8': 'category', '\xa0moral_statements_9': 'category',
+                '\xa0moral_statements_10': 'category', '\xa0moral_statements_11': 'category',
+                '\xa0moral_statements_12': 'category', '\xa0moral_statements_13': 'category',
+                '\xa0moral_statements_14': 'category', '\xa0moral_statements_15': 'category',
+                '\xa0moral_statements_16': 'category', 'politics_orientation_1': 'float64', 'politics_vote': 'category',
+                'politics_climate': 'category', 'soc_inequ_climate': 'category', 'covid_coping': 'category',
+                'covid_finance': 'category', 'income.1': 'category', 'region_prefix': 'category',
+                'unemployment_rate': 'category', 'unemployment_count': 'int64', 'patent': 'int64',
+                'treat_info': 'category', 'endline_info': 'category', 'adequacy': 'category', 'goal': 'category',
+                'climatedeniers_1': 'int64'
+            }
+        )
 
         data = data[data.climatedeniers_1 != 2]
 
-        drop_columns(data, to_be_dropped_columns)
+        data = data.drop(columns=to_be_dropped_columns)
 
         if target_column == "climatedeniers_2":
-            drop_columns(data,
-                              ["climate_eb_problem", "climate_state_convinced", "climatedeniers_1", "climate_risk",
-                               "d_q1_own_opinion"])
+            data.drop(columns=["climate_eb_problem", "climate_state_convinced", "climatedeniers_1", "climate_risk",
+                               "d_q1_own_opinion"], inplace=True)
         elif target_column == "climatedeniers_1":
-            drop_columns(data, ["climate_risk", "climate_eb_problem_1", "politics_vote", "climate_eb_responsib"])
+            data = data.drop(columns=["climate_risk", "climate_eb_problem_1", "politics_vote", "climate_eb_responsib"])
 
         data = data[data.columns.drop(list(data.filter(regex='climate_pol_engage_')))]
         data = data[data.columns.drop(list(data.filter(regex='climate_policies_')))]
