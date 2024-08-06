@@ -1,0 +1,10 @@
+max_depth,150
+n_estimators,1350
+learning_rate,0.025
+subsample,0.1
+colsample_bytree,0.46
+sampling,over
+sampling_strategy,not majority
+max_leaves,832
+objective,binary:logistic
+impute,False
