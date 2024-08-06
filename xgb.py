@@ -17,9 +17,6 @@ import argparse
 
 class ClimateDeniersClassifier:
 
-    def __init__(self):
-        self.data = data
-
     def preprocess_data(self, impute):
 
         if impute:
@@ -89,6 +86,8 @@ class ClimateDeniersClassifier:
         )
 
         objective_values = []
+
+        self.data = data.copy()
 
         self.preprocess_data(impute=impute)
         self.train_val, self.test = train_test_split(self.data, test_size=0.2, random_state=42)
