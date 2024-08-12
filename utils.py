@@ -12,12 +12,12 @@ def impute_data(data):
     train_val, _ = train_test_split(data, test_size=0.2, random_state=42)
 
     imp_str = SimpleImputer(strategy="most_frequent")
-    imp_str = imp_str.fit(train_val.select_dtypes(include=['category']))
-    imputed_data_str = pd.DataFrame(imp_str.transform(data.select_dtypes(include=['category'])))
-    imputed_data_str.columns = data.select_dtypes(include=['category']).columns
+    imp_str = imp_str.fit(train_val.select_dtypes(include=['O']))
+    imputed_data_str = pd.DataFrame(imp_str.transform(data.select_dtypes(include=['O'])))
+    imputed_data_str.columns = data.select_dtypes(include=['O']).columns
     imputed_data_str.index = data.index
 
-    num_columns = [x for x in data.columns.tolist() if x not in data.select_dtypes(include=['category']).columns.tolist() ]
+    num_columns = [x for x in data.columns.tolist() if x not in data.select_dtypes(include=['O']).columns.tolist()]
     imp_num = IterativeImputer(random_state=42, estimator=sklearn.ensemble.HistGradientBoostingRegressor())
     imp_num = imp_num.fit(train_val[num_columns])
     imputed_data_num = pd.DataFrame(imp_num.transform(data[num_columns]))
