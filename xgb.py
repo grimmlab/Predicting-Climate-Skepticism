@@ -14,6 +14,7 @@ from imblearn.over_sampling import RandomOverSampler
 from imblearn.under_sampling import RandomUnderSampler
 from utils import impute_data, encode_data, get_indexes, run_optuna_optimization
 import argparse
+import torch
 
 class ClimateDeniersClassifier:
 
@@ -24,11 +25,11 @@ class ClimateDeniersClassifier:
         else:
             self.data.dropna(inplace=True)
 
-        for column in self.data.columns:
-            if self.data[column].dtype == 'O':
-                self.data[column] = self.data[column].astype('category')
+        # for column in self.data.columns:
+        #     if self.data[column].dtype == 'O':
+        #         self.data[column] = self.data[column].astype('category')
 
-        # data = encode_data(data)
+        self.data = encode_data(self.data)
 
     def retrain(self, retrain: pd.DataFrame, model):
         x_train = retrain.drop(target_column, axis=1)
@@ -83,6 +84,7 @@ class ClimateDeniersClassifier:
             max_leaves=max_leaves,
             objective=objective,
             enable_categorical=True,
+            device="cuda" if torch.cuda.is_available() else "cpu"
         )
 
         objective_values = []
@@ -146,14 +148,14 @@ class ClimateDeniersClassifier:
         feat_import_df = pd.DataFrame()
         feature_importances = model.feature_importances_
         sorted_idx = feature_importances.argsort()[::-1]
-        feat_import_df["feature"] = climate_deniers_classifier.data.drop([target_column], axis=1).columns[sorted_idx]
+        feat_import_df["feature"] = self.data.drop([target_column], axis=1).columns[sorted_idx]
         feat_import_df["feature_importance"] = feature_importances[sorted_idx]
 
         return feat_import_df
 
     def shap(self):
-        explainer = shap.Explainer(self.best_model.predict, climate_deniers_classifier.test.drop(target_column, axis=1))
-        shap_values = explainer(climate_deniers_classifier.test.drop(target_column, axis=1))
+        explainer = shap.Explainer(self.best_model.predict, self.test.drop(target_column, axis=1))
+        shap_values = explainer(self.test.drop(target_column, axis=1))
 
         filename_expl = 'explainer.sav'
         pickle.dump(explainer, open("explainer/" + filename_expl, 'wb'))
@@ -161,11 +163,11 @@ class ClimateDeniersClassifier:
         filename = 'shapvalues.sav'
         pickle.dump(shap_values, open("shapvalues/" + filename, 'wb'))
 
-        for feature in climate_deniers_classifier.data.drop(target_column, axis=1).columns:
+        for feature in self.data.drop(target_column, axis=1).columns:
             shap.partial_dependence_plot(
                 feature,
                 self.best_model.predict,
-                climate_deniers_classifier.test.drop(target_column, axis=1),
+                self.test.drop(target_column, axis=1),
                 ice=False,
                 model_expected_value=True,
                 feature_expected_value=True,
@@ -179,7 +181,7 @@ class ClimateDeniersClassifier:
         best_params = run_optuna_optimization(objective=self.objective)
 
         self.best_model = xgboost.XGBClassifier(**best_params, enable_categorical=True, random_state=42, verbosity=1,
-            tree_method="auto")
+            tree_method="auto", device="cuda" if torch.cuda.is_available() else "cpu")
 
         self.retrain(self.train_val, self.best_model)
 
@@ -208,7 +210,7 @@ class ClimateDeniersClassifier:
             index=False,
         )
 
-        # self.shap()
+        self.shap()
 
 if __name__ == "__main__":
 
@@ -232,13 +234,10 @@ if __name__ == "__main__":
 
     full_data = full_data.drop(columns=to_be_dropped_columns)
 
-    if target_column == "climatedeniers_2":
-        full_data.drop(columns=["climate_eb_problem", "climate_state_convinced", "climatedeniers_1", "climate_risk",
-                           "d_q1_own_opinion"], inplace=True)
-    elif target_column == "climatedeniers_1":
-        full_data = full_data.drop(columns=["climate_risk", "climate_eb_problem_1", "politics_vote", "climate_eb_responsib"])
+    full_data = full_data.drop(columns=["LocationLatitude", "LocationLongitude", "treat_info", "endline_info",
+                                        "adequacy", "goal"])
 
-    datfull_dataa = full_data[full_data.columns.drop(list(full_data.filter(regex='climate_pol_engage_')))]
+    full_data = full_data[full_data.columns.drop(list(full_data.filter(regex='climate_pol_engage_')))]
     full_data = full_data[full_data.columns.drop(list(full_data.filter(regex='climate_policies_')))]
     full_data = full_data[full_data.columns.drop(list(full_data.filter(regex='climate_statements_')))]
 

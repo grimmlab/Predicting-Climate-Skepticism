@@ -1,145 +1,136 @@
 feature,feature_importance
-politics_climate,0.0551536828
-climate_eb_renewable,0.0538969487
-climate_eb_ets,0.0330316164
-climate_eb_efficient,0.0311039370
-climate_trust_5,0.0174726993
-climate_pol_engage_2,0.0171821881
-migration_region,0.0127054155
-region_2,0.0118884742
-climate_eb_statement_4,0.0116883246
-migration_b_g_drill_2,0.0114130201
-b_q2_population,0.0110718692
-climate_eb_statement_6,0.0109728472
-migration_s_g_drill_2,0.0109378388
-climate_pol_engage_3,0.0108078104
-climate_eb_statement_3,0.0096681127
-GPS_72_A,0.0090316813
-climate_pol_engage_1,0.0089192661
-region_3,0.0085938647
-migration_s_g_drill_3,0.0085229697
-income,0.0083532389
-job_field_2,0.0083053727
-climate_flood_affect,0.0077711041
-e_q2_population,0.0076792669
-GPS_73_D,0.0076217004
-migration_b_g_drill_3,0.0075515509
-bioecon_products,0.0075415219
-climate_trust_3,0.0074099745
-b_q1_own_opinion,0.0074043260
-GPS_72_D,0.0072615598
- moral_statements_6,0.0072182822
-GPS_73_E,0.0071251495
-GPS_72_C,0.0070476830
-GPS_73_B,0.0070020254
-GPS_72_B,0.0069803311
-GPS_71,0.0068108663
-climate_know,0.0067951055
-climate_pol_engage_5,0.0066128527
-unemployment_rate,0.0065202415
-migration_b_g_city,0.0064724493
-GPS_73_A,0.0063880631
- moral_statements_2,0.0063098073
-climate_pol_engage_4,0.0062828050
-GPS_73_C,0.0062802946
-climate_trust_6,0.0061678397
-e_q1_own_opinion,0.0061662379
-migration_s_g_drill_1,0.0061406712
-b_q1_point_guess,0.0060951812
-moral_right_wrong_8,0.0060667060
-climate_trust_7,0.0060636220
-subject_well_being_1,0.0060316208
- moral_statements_4,0.0059389262
- moral_statements_10,0.0059379875
-climate_eb_statement_1,0.0059267436
- moral_statements_8,0.0059067733
-religion,0.0057710977
-GPS_105,0.0057578823
-moral_right_wrong_11,0.0057508522
-moral_right_wrong_2,0.0057219034
- moral_statements_5,0.0057118353
- moral_statements_9,0.0056927442
-job_field_1,0.0056512635
-climate_eb_statement_5,0.0056044133
-moral_right_wrong_7,0.0056002596
-moral_right_wrong_4,0.0055983914
- moral_statements_12,0.0055595245
-moral_right_wrong_15,0.0055267047
-climate_trust_2,0.0054580397
-climate_pol_engage_7,0.0054564485
-moral_right_wrong_13,0.0054193703
-moral_right_wrong_3,0.0054153185
- moral_statements_3,0.0054116296
-covid_coping,0.0053714602
-migration_s_g_city,0.0053147413
-e_q2_point_guess,0.0053099967
-climate_eb_statement_2,0.0053038402
- moral_statements_14,0.0052990355
-moral_right_wrong_5,0.0052916221
-moral_right_wrong_14,0.0052707726
-moral_right_wrong_1,0.0052490863
- moral_statements_11,0.0051990701
-climate_trust_4,0.0051981709
-b_q1_distribution_3,0.0051589836
-job,0.0051460876
-covid_finance,0.0051424829
-moral_right_wrong_16,0.0051391395
-GPS_74,0.0051374575
-moral_right_wrong_6,0.0051328856
-e_q1_point_guess,0.0051327762
-moral_right_wrong_12,0.0050840243
-migration_b_g_drill_1,0.0050485204
- moral_statements_13,0.0050442964
-education,0.0050305608
-moral_right_wrong_9,0.0050210999
- moral_statements_1,0.0050176764
-region_1,0.0050018365
-soc_inequ_climate,0.0049700784
-e_q2_distribution_4,0.0049686250
-climate_trust_1,0.0049669202
-endline_info,0.0049472181
- moral_statements_16,0.0049255020
-children,0.0048898589
-b_q1_distribution_5,0.0048256330
- moral_statements_15,0.0048245452
-moral_right_wrong_10,0.0048123836
-innovation,0.0048085060
-climate_pol_engage_6,0.0047646179
-e_q2_distribution_1,0.0047462224
-b_q2_distribution_4,0.0047405660
-b_q1_distribution_1,0.0047321725
-e_q1_distribution_5,0.0047286539
-GPS_107,0.0046707341
-b_q2_point_guess,0.0046532187
-GPS_106,0.0046474575
-e_q2_distribution_3,0.0045741056
-e_q1_distribution_2,0.0045593851
-e_q2_distribution_5,0.0045261965
-politics_orientation_1,0.0045204512
-religion_practice,0.0044925669
-unemployment_count,0.0044845212
-b_q1_distribution_4,0.0044216434
-b_q2_distribution_1,0.0043981574
- moral_statements_7,0.0042853490
-adequacy,0.0042464505
-gender,0.0042363242
-b_q2_distribution_3,0.0041858000
-marital_status,0.0041848128
-b_q2_distribution_5,0.0041606408
-e_q1_distribution_3,0.0041449708
-income.1,0.0040813093
-b_q2_distribution_2,0.0040590502
-b_q1_distribution_2,0.0040060561
-e_q1_distribution_1,0.0039101816
-region_prefix,0.0038998823
-age,0.0038675156
-e_q1_distribution_4,0.0038210142
-treat_info,0.0037803226
-LocationLatitude,0.0037582167
-e_q2_distribution_2,0.0036039387
-LocationLongitude,0.0033625937
-patent,0.0031978090
-plz,0.0021830224
-goal,0.0000210681
-migration_b_germany,0.0000000000
+climate_eb_problem_1,0.3090506792
+climate_risk,0.1391905397
+climate_trust_5,0.0367598832
+politics_climate,0.0339768082
+climate_eb_ets,0.0291335229
+climate_eb_renewable,0.0148764290
+climate_eb_responsib,0.0122140786
+education,0.0119446618
+climate_eb_efficient,0.0112694595
+climate_trust_3,0.0106511656
+GPS_73_E,0.0102644479
+climate_eb_statement_3,0.0084953252
+b_q2_distribution_3,0.0081958510
+e_q1_distribution_5,0.0070621972
+GPS_73_B,0.0070243403
+e_q2_population,0.0068847644
+GPS_72_C,0.0068255207
+e_q1_own_opinion,0.0065982738
+politics_orientation_1,0.0064394656
+region_1,0.0063052746
+GPS_72_D,0.0062856157
+region_2,0.0054752021
+religion_practice,0.0054615200
+marital_status,0.0054334919
+GPS_71,0.0054158755
+region_3,0.0054140161
+b_q1_own_opinion,0.0053584999
+income,0.0053407988
+migration_b_g_drill_2,0.0050927661
+migration_b_g_drill_1,0.0050531467
+e_q1_distribution_4,0.0049900180
+migration_region,0.0049860445
+moral_right_wrong_14,0.0048544551
+ moral_statements_7,0.0048486227
+moral_right_wrong_4,0.0046464354
+GPS_73_D,0.0045926301
+moral_right_wrong_3,0.0045736316
+moral_right_wrong_10,0.0045382716
+moral_right_wrong_7,0.0045360457
+politics_vote,0.0045082211
+b_q2_population,0.0045051896
+e_q1_distribution_2,0.0044954349
+unemployment_rate,0.0044484329
+climate_eb_statement_5,0.0043995022
+climate_know,0.0042954385
+climate_trust_7,0.0041351528
+GPS_74,0.0041252226
+ moral_statements_10,0.0040536905
+job,0.0039464608
+children,0.0038096001
+e_q2_distribution_4,0.0037655060
+moral_right_wrong_9,0.0036764189
+ moral_statements_3,0.0036537563
+climate_eb_statement_2,0.0036505379
+b_q1_distribution_5,0.0036372992
+GPS_72_B,0.0036149842
+moral_right_wrong_15,0.0035860718
+gender,0.0033624053
+moral_right_wrong_8,0.0032490811
+climate_trust_6,0.0032013322
+ moral_statements_12,0.0032003729
+ moral_statements_1,0.0031600923
+moral_right_wrong_2,0.0031355936
+moral_right_wrong_5,0.0031166403
+climate_trust_2,0.0030966734
+moral_right_wrong_16,0.0030792721
+b_q1_point_guess,0.0030558298
+migration_s_g_drill_2,0.0030504949
+job_field_2,0.0030401202
+GPS_105,0.0030387782
+region_prefix,0.0030261409
+ moral_statements_15,0.0029649024
+climate_eb_statement_1,0.0029318298
+e_q2_distribution_3,0.0028948623
+ moral_statements_5,0.0028920569
+e_q1_distribution_3,0.0028706081
+climate_eb_statement_4,0.0028192825
+ moral_statements_4,0.0027855234
+moral_right_wrong_11,0.0027156153
+covid_coping,0.0027073058
+ moral_statements_9,0.0026879294
+climate_eb_statement_6,0.0026825129
+e_q2_distribution_1,0.0026590300
+b_q2_distribution_1,0.0026478407
+ moral_statements_16,0.0025736499
+ moral_statements_11,0.0023744600
+moral_right_wrong_1,0.0023290596
+b_q2_point_guess,0.0022930899
+migration_s_g_drill_1,0.0022811624
+b_q1_distribution_1,0.0022564556
+GPS_73_C,0.0022360920
+GPS_73_A,0.0022035278
+moral_right_wrong_6,0.0021161761
+moral_right_wrong_12,0.0019950175
+bioecon_products,0.0019898233
+b_q2_distribution_4,0.0019094080
+b_q1_distribution_3,0.0018894972
+GPS_72_A,0.0018698702
+innovation,0.0018596818
+moral_right_wrong_13,0.0018557389
+b_q1_distribution_4,0.0018255720
+ moral_statements_6,0.0018183785
+religion,0.0018155613
+unemployment_count,0.0017978512
+job_field_1,0.0017890601
+subject_well_being_1,0.0017880053
+income.1,0.0016936206
+age,0.0016563615
+covid_finance,0.0016147010
+b_q1_distribution_2,0.0015639178
+e_q2_distribution_5,0.0015318276
+soc_inequ_climate,0.0015052236
+ moral_statements_13,0.0014965602
+climate_trust_1,0.0014732818
+e_q1_distribution_1,0.0013176462
+e_q2_distribution_2,0.0013005960
+climate_trust_4,0.0012203923
+ moral_statements_14,0.0011896997
+patent,0.0010960529
+b_q2_distribution_2,0.0010099185
+ moral_statements_2,0.0009899948
+migration_b_g_drill_3,0.0008480672
+e_q1_point_guess,0.0006481329
+GPS_107,0.0004610934
+b_q2_distribution_5,0.0000768897
+migration_b_g_city,0.0000000000
 migration_s_germany,0.0000000000
+migration_b_germany,0.0000000000
+ moral_statements_8,0.0000000000
+migration_s_g_city,0.0000000000
+migration_s_g_drill_3,0.0000000000
+e_q2_point_guess,0.0000000000
+GPS_106,0.0000000000
+climate_flood_affect,0.0000000000
+plz,0.0000000000

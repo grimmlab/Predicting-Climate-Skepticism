@@ -1,10 +1,10 @@
-max_depth,415
-n_estimators,300
-learning_rate,0.025
-subsample,0.35000000000000003
-colsample_bytree,0.785
-sampling,over
-sampling_strategy,minmajority
-max_leaves,580
-objective,binary:logistic
+max_depth,432
+n_estimators,600
+learning_rate,0.2
+subsample,0.15000000000000002
+colsample_bytree,0.295
+sampling,under
+sampling_strategy,not minority
+max_leaves,170
+objective,binary:logitraw
 impute,True
