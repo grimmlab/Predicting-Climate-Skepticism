@@ -198,7 +198,7 @@ def create_new_study() -> optuna.study.Study:
 
 def run_optuna_optimization(objective) -> dict:
     study = create_new_study()
-    study.optimize(lambda trial: objective(trial=trial), n_trials=200)
+    study.optimize(lambda trial: objective(trial=trial), n_trials=2)
     print(study.best_trial.value)
     print(study.best_params)
     print(optuna.importance.get_param_importances(study))

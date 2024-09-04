@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 import copy
 import pickle
 import matplotlib.pyplot as plt
-from sklearn.metrics import classification_report, matthews_corrcoef
+from sklearn.metrics import classification_report, matthews_corrcoef, ConfusionMatrixDisplay
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.under_sampling import RandomUnderSampler
 from utils import impute_data, encode_data, get_indexes, run_optuna_optimization
@@ -197,6 +197,15 @@ class ClimateDeniersClassifier:
             w.writerows(best_params.items())
         print(classification_report(y_true=self.test[target_column], y_pred=predictions))
         print(matthews_corrcoef(y_true=self.test[target_column], y_pred=predictions))
+        disp = ConfusionMatrixDisplay.from_predictions(
+            self.test[target_column],
+            predictions,
+            cmap=plt.cm.Blues,
+        )
+
+        print(disp.confusion_matrix)
+
+        plt.show()
         with open('matthews_corrcoef/matthews_corrcoef_xgb' + str(to_be_dropped_columns) + '.txt', 'w') as f:
             f.write("matthews_corrcoef: %.2f" % matthews_corrcoef(y_true=self.test[target_column],
                                                                   y_pred=predictions))
