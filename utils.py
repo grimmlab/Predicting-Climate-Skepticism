@@ -7,6 +7,7 @@ import sklearn
 import datetime
 import optuna
 import pandas as pd
+import numpy as np
 
 def impute_data(data):
     train_val, _ = train_test_split(data, test_size=0.2, random_state=42)
@@ -32,9 +33,12 @@ def encode_data(data):
                  "migration_b_germany", "migration_b_g_city", "migration_b_g_drill_1", "migration_b_g_drill_2",
                  "migration_b_g_drill_3", "migration_s_germany", "migration_s_g_city", "migration_s_g_drill_1",
                  "migration_s_g_drill_2", "migration_s_g_drill_3", "GPS_74", "GPS_107", "climate_eb_responsib",
-                 "bioecon_products", "politics_vote", "region_prefix", "job_field_1", "job_field_2"]
+                 "bioecon_products", "politics_vote", "region_prefix", "job_field_1", "job_field_2", "treat_info",
+                  "endline_info", "adequacy", "goal"]
     for col in label_cols:
-        data[col] = (LabelEncoder().fit_transform(data[[col]]))
+        encoder = LabelEncoder()
+        data[col] = (encoder.fit_transform(data[[col]]))
+        np.savetxt('encoder_classes/encoder_classes' + col + '.txt', encoder.classes_, fmt='%s')
 
     data['GPS_71'] = data['GPS_71'].replace(["Weiß nicht"], [-1]).astype("int")
     data['GPS_72_A'] = data['GPS_72_A'].replace(
@@ -86,7 +90,12 @@ def encode_data(data):
     data["religion_practice"] = oe_religion_practice.fit_transform(data[["religion_practice"]])
 
     cols_innovation = ["innovation", "climate_eb_statement_1", "climate_eb_statement_2", "climate_eb_statement_3",
-                       "climate_eb_statement_4", "climate_eb_statement_5",	"climate_eb_statement_6"]
+                       "climate_eb_statement_4", "climate_eb_statement_5",	"climate_eb_statement_6",
+                       "climate_policies_1", "climate_policies_2", "climate_policies_3", "climate_policies_4",
+                       "climate_statements_1", "climate_statements_2", "climate_statements_3", "climate_statements_4",
+                       "climate_statements_5", "climate_statements_6", "climate_statements_7", "climate_statements_8",
+                       "climate_statements_9", "climate_statements_10", "climate_statements_11", "climate_statements_12",
+                       "climate_statements_13", "climate_statements_14", "climate_statements_15"]
     for col in cols_innovation:
         oe_innovation = OrdinalEncoder(categories=[['Keine Angabe', 'Stimme überhaupt nicht zu', 'Stimme eher nicht zu',
                                                     'Weder noch', 'Stimme eher zu', 'Stimme voll und ganz zu']])
@@ -160,6 +169,13 @@ def encode_data(data):
     data["covid_finance"] = oe_covid_finance.fit_transform(data[["covid_finance"]])
     oe_income1 = OrdinalEncoder(categories=[["low", "middle", "high"]])
     data["income.1"] = oe_income1.fit_transform(data[["income.1"]])
+    cols_climate_pol_engage = ["climate_pol_engage_1", "climate_pol_engage_2", "climate_pol_engage_3",
+                         "climate_pol_engage_4", "climate_pol_engage_5", "climate_pol_engage_6", "climate_pol_engage_7"]
+    for col in cols_climate_pol_engage:
+        oe_climate_pol_engage = OrdinalEncoder(
+            categories=[["Würde ich sicher nicht machen", "Würde ich wahrscheinlich nicht machen",
+                               "Würde ich wahrscheinlich machen", "Würde ich sicher machen", "Mache ich bereits"]])
+        data[col] = oe_climate_pol_engage.fit_transform(data[[col]])
 
     return data
 
@@ -198,7 +214,7 @@ def create_new_study() -> optuna.study.Study:
 
 def run_optuna_optimization(objective) -> dict:
     study = create_new_study()
-    study.optimize(lambda trial: objective(trial=trial), n_trials=2)
+    study.optimize(lambda trial: objective(trial=trial), n_trials=100)
     print(study.best_trial.value)
     print(study.best_params)
     print(optuna.importance.get_param_importances(study))

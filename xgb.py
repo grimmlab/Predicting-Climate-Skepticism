@@ -241,14 +241,14 @@ if __name__ == "__main__":
 
     full_data = full_data[full_data.climatedeniers_1 != 2]
 
-    full_data = full_data.drop(columns=to_be_dropped_columns)
-
-    full_data = full_data.drop(columns=["LocationLatitude", "LocationLongitude", "treat_info", "endline_info",
-                                        "adequacy", "goal"])
-
-    full_data = full_data[full_data.columns.drop(list(full_data.filter(regex='climate_pol_engage_')))]
-    full_data = full_data[full_data.columns.drop(list(full_data.filter(regex='climate_policies_')))]
-    full_data = full_data[full_data.columns.drop(list(full_data.filter(regex='climate_statements_')))]
+    # full_data = full_data.drop(columns=to_be_dropped_columns)
+    #
+    # full_data = full_data.drop(columns=["LocationLatitude", "LocationLongitude", "treat_info", "endline_info",
+    #                                     "adequacy", "goal"])
+    #
+    # full_data = full_data[full_data.columns.drop(list(full_data.filter(regex='climate_pol_engage_')))]
+    # full_data = full_data[full_data.columns.drop(list(full_data.filter(regex='climate_policies_')))]
+    # full_data = full_data[full_data.columns.drop(list(full_data.filter(regex='climate_statements_')))]
 
     climate_deniers_classifier = ClimateDeniersClassifier()
     climate_deniers_classifier.run_pipeline()

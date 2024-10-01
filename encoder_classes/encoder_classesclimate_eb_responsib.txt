@@ -1,0 +1,157 @@
+Andere
+Andere,Niemand
+Andere,Niemand,Weiß nicht
+Die europäische Union
+Die europäische Union,Andere
+Die europäische Union,Andere,Niemand
+Die europäische Union,Gruppen von Umweltaktivist:innen
+Die europäische Union,Gruppen von Umweltaktivist:innen,Niemand
+Die europäische Union,Niemand
+Die europäische Union,Niemand,Weiß nicht
+Die europäische Union,Regionale und lokale Regierungen
+Die europäische Union,Regionale und lokale Regierungen,Andere
+Die europäische Union,Regionale und lokale Regierungen,Gruppen von Umweltaktivist:innen
+Die europäische Union,Regionale und lokale Regierungen,Sie selbst persönlich
+Die europäische Union,Regionale und lokale Regierungen,Sie selbst persönlich,Andere
+Die europäische Union,Regionale und lokale Regierungen,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie
+Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen
+Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich
+Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Andere
+Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen,Andere
+Die europäische Union,Sie selbst persönlich
+Die europäische Union,Sie selbst persönlich,Andere
+Die europäische Union,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Die europäische Union,Sie selbst persönlich,Gruppen von Umweltaktivist:innen,Andere
+Die europäische Union,Sie selbst persönlich,Weiß nicht
+Die europäische Union,Weiß nicht
+Die europäische Union,Wirtschaft und Industrie
+Die europäische Union,Wirtschaft und Industrie,Andere
+Die europäische Union,Wirtschaft und Industrie,Andere,Weiß nicht
+Die europäische Union,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen
+Die europäische Union,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen,Andere
+Die europäische Union,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen,Niemand
+Die europäische Union,Wirtschaft und Industrie,Niemand
+Die europäische Union,Wirtschaft und Industrie,Sie selbst persönlich
+Die europäische Union,Wirtschaft und Industrie,Sie selbst persönlich,Andere
+Die europäische Union,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Die europäische Union,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen,Andere
+Die europäische Union,Wirtschaft und Industrie,Sie selbst persönlich,Niemand
+Die europäische Union,Wirtschaft und Industrie,Weiß nicht
+Gruppen von Umweltaktivist:innen
+Gruppen von Umweltaktivist:innen,Niemand
+Gruppen von Umweltaktivist:innen,Weiß nicht
+Nationale Regierungen
+Nationale Regierungen,Andere
+Nationale Regierungen,Die europäische Union
+Nationale Regierungen,Die europäische Union,Andere
+Nationale Regierungen,Die europäische Union,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Die europäische Union,Gruppen von Umweltaktivist:innen,Andere
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Andere
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Gruppen von Umweltaktivist:innen,Weiß nicht
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Sie selbst persönlich
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Sie selbst persönlich,Andere
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Sie selbst persönlich,Gruppen von Umweltaktivist:innen,Andere
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Andere
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen,Andere
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen,Niemand
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen,Weiß nicht
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Andere
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Andere,Niemand
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen,Andere
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen,Andere,Niemand
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen,Andere,Weiß nicht
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen,Niemand
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Niemand
+Nationale Regierungen,Die europäische Union,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Weiß nicht
+Nationale Regierungen,Die europäische Union,Sie selbst persönlich
+Nationale Regierungen,Die europäische Union,Sie selbst persönlich,Andere
+Nationale Regierungen,Die europäische Union,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Die europäische Union,Sie selbst persönlich,Weiß nicht
+Nationale Regierungen,Die europäische Union,Wirtschaft und Industrie
+Nationale Regierungen,Die europäische Union,Wirtschaft und Industrie,Andere
+Nationale Regierungen,Die europäische Union,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Die europäische Union,Wirtschaft und Industrie,Niemand
+Nationale Regierungen,Die europäische Union,Wirtschaft und Industrie,Sie selbst persönlich
+Nationale Regierungen,Die europäische Union,Wirtschaft und Industrie,Sie selbst persönlich,Andere
+Nationale Regierungen,Die europäische Union,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Die europäische Union,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen,Andere
+Nationale Regierungen,Die europäische Union,Wirtschaft und Industrie,Weiß nicht
+Nationale Regierungen,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Niemand
+Nationale Regierungen,Regionale und lokale Regierungen
+Nationale Regierungen,Regionale und lokale Regierungen,Andere,Weiß nicht
+Nationale Regierungen,Regionale und lokale Regierungen,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Regionale und lokale Regierungen,Gruppen von Umweltaktivist:innen,Niemand
+Nationale Regierungen,Regionale und lokale Regierungen,Niemand
+Nationale Regierungen,Regionale und lokale Regierungen,Sie selbst persönlich
+Nationale Regierungen,Regionale und lokale Regierungen,Sie selbst persönlich,Andere
+Nationale Regierungen,Regionale und lokale Regierungen,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Regionale und lokale Regierungen,Wirtschaft und Industrie
+Nationale Regierungen,Regionale und lokale Regierungen,Wirtschaft und Industrie,Andere
+Nationale Regierungen,Regionale und lokale Regierungen,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Regionale und lokale Regierungen,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen,Andere
+Nationale Regierungen,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich
+Nationale Regierungen,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Andere
+Nationale Regierungen,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen,Andere
+Nationale Regierungen,Regionale und lokale Regierungen,Wirtschaft und Industrie,Weiß nicht
+Nationale Regierungen,Sie selbst persönlich
+Nationale Regierungen,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Weiß nicht
+Nationale Regierungen,Wirtschaft und Industrie
+Nationale Regierungen,Wirtschaft und Industrie,Andere
+Nationale Regierungen,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Wirtschaft und Industrie,Niemand
+Nationale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich
+Nationale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Andere
+Nationale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Nationale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Weiß nicht
+Nationale Regierungen,Wirtschaft und Industrie,Weiß nicht
+Niemand
+Niemand,Weiß nicht
+Regionale und lokale Regierungen
+Regionale und lokale Regierungen,Andere
+Regionale und lokale Regierungen,Andere,Niemand
+Regionale und lokale Regierungen,Gruppen von Umweltaktivist:innen
+Regionale und lokale Regierungen,Gruppen von Umweltaktivist:innen,Andere
+Regionale und lokale Regierungen,Gruppen von Umweltaktivist:innen,Niemand
+Regionale und lokale Regierungen,Niemand
+Regionale und lokale Regierungen,Sie selbst persönlich
+Regionale und lokale Regierungen,Sie selbst persönlich,Andere
+Regionale und lokale Regierungen,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Regionale und lokale Regierungen,Sie selbst persönlich,Gruppen von Umweltaktivist:innen,Andere
+Regionale und lokale Regierungen,Weiß nicht
+Regionale und lokale Regierungen,Wirtschaft und Industrie
+Regionale und lokale Regierungen,Wirtschaft und Industrie,Andere
+Regionale und lokale Regierungen,Wirtschaft und Industrie,Andere,Niemand
+Regionale und lokale Regierungen,Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen
+Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich
+Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Andere
+Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Regionale und lokale Regierungen,Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen,Andere
+Sie selbst persönlich
+Sie selbst persönlich,Andere
+Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Sie selbst persönlich,Niemand
+Sie selbst persönlich,Weiß nicht
+Weiß nicht
+Wirtschaft und Industrie
+Wirtschaft und Industrie,Andere
+Wirtschaft und Industrie,Gruppen von Umweltaktivist:innen
+Wirtschaft und Industrie,Niemand
+Wirtschaft und Industrie,Sie selbst persönlich
+Wirtschaft und Industrie,Sie selbst persönlich,Andere
+Wirtschaft und Industrie,Sie selbst persönlich,Andere,Weiß nicht
+Wirtschaft und Industrie,Sie selbst persönlich,Gruppen von Umweltaktivist:innen
+Wirtschaft und Industrie,Sie selbst persönlich,Niemand
+Wirtschaft und Industrie,Sie selbst persönlich,Weiß nicht
+Wirtschaft und Industrie,Weiß nicht
