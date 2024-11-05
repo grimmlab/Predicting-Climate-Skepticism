@@ -16,20 +16,13 @@ class SVClassifier(base_model_.BaseModel, abc.ABC):
             self.sampling_strategy = "minority"
         if self.sampling == "under" and self.sampling_strategy == "minmajority":
             self.sampling_strategy = "majority"
-        self.standardize_X = self.suggest_hyperparam_to_optuna('standardize_X')
-        if self.standardize_X:
-            self.x_scaler = sklearn.preprocessing.StandardScaler()
+        self.standardize_X = True
+        self.x_scaler = sklearn.preprocessing.StandardScaler()
         self.impute = self.suggest_hyperparam_to_optuna('impute')
 
         C = self.suggest_hyperparam_to_optuna('C')
-        kernel = self.suggest_hyperparam_to_optuna('kernel')
-        degree = self.suggest_hyperparam_to_optuna('degree')
-        shrinking = self.suggest_hyperparam_to_optuna('shrinking')
-        probability = self.suggest_hyperparam_to_optuna('probability')
-        tol = self.suggest_hyperparam_to_optuna('tol')
 
-        return sklearn.svm.SVC(
-            C=C, kernel=kernel, degree=degree, random_state=42, shrinking=shrinking, probability=probability, tol=tol)
+        return sklearn.svm.SVC(C=C, kernel="sigmoid", random_state=42)
 
     def define_hyperparams_to_tune(self) -> dict:
         """
@@ -39,29 +32,6 @@ class SVClassifier(base_model_.BaseModel, abc.ABC):
             'C': {
                 'datatype': 'categorical',
                 'list_of_values': [0.01, 0.1, 1, 10, 100],
-            },
-            'shrinking': {
-                'datatype': 'categorical',
-                'list_of_values': [True, False],
-            },
-            'probability': {
-                'datatype': 'categorical',
-                'list_of_values': [True, False],
-            },
-            'tol': {
-                'datatype': 'float',
-                'lower_bound': 0.0001,
-                'upper_bound': 0.1,
-                'log': True
-            },
-            'degree': {
-                'datatype': 'int',
-                'lower_bound': 1,
-                'upper_bound': 10
-            },
-            'kernel': {
-                'datatype': 'categorical',
-                'list_of_values': ["linear", "poly", "rbf", "sigmoid"]
             }
         }
 

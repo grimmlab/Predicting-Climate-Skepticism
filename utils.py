@@ -178,20 +178,24 @@ def preprocess_data(to_be_dropped_columns: list = None):
     return full_data
 
 
-def impute_data(data: pd.DataFrame = None):
-    train_val, _ = sklearn.model_selection.train_test_split(data, test_size=0.2, random_state=42)
+def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None):
 
-    imp_str = sklearn.impute.SimpleImputer(strategy="most_frequent")
-    imp_str = imp_str.fit(train_val.select_dtypes(include=['O']))
-    imputed_data_str = pd.DataFrame(imp_str.transform(data.select_dtypes(include=['O'])))
-    imputed_data_str.columns = data.select_dtypes(include=['O']).columns
-    imputed_data_str.index = data.index
+    imp_str = sklearn.impute.SimpleImputer(strategy="most_frequent").fit(train.select_dtypes(include=['O']))
+    train_str_imp = pd.DataFrame(imp_str.transform(train.select_dtypes(include=['O'])))
+    test_str_imp = pd.DataFrame(imp_str.transform(test.select_dtypes(include=['O'])))
+    train_str_imp.columns = train.select_dtypes(include=['O']).columns
+    train_str_imp.index = train.index
+    test_str_imp.columns = test.select_dtypes(include=['O']).columns
+    test_str_imp.index = test.index
 
-    num_columns = [x for x in data.columns.tolist() if x not in data.select_dtypes(include=['O']).columns.tolist()]
-    imp_num = sklearn.impute.IterativeImputer(random_state=42, estimator=sklearn.ensemble.HistGradientBoostingRegressor())
-    imp_num = imp_num.fit(train_val[num_columns])
-    imputed_data_num = pd.DataFrame(imp_num.transform(data[num_columns]))
-    imputed_data_num.columns = data[num_columns].columns
-    imputed_data_num.index = data.index
+    num_columns = [x for x in train.columns.tolist() if x not in train.select_dtypes(include=['O']).columns.tolist()]
+    imp_num = sklearn.impute.IterativeImputer(
+        random_state=42, estimator=sklearn.ensemble.HistGradientBoostingRegressor()).fit(train[num_columns])
+    train_num_imp = pd.DataFrame(imp_num.transform(train[num_columns]))
+    test_num_imp = pd.DataFrame(imp_num.transform(test[num_columns]))
+    train_num_imp.columns = train[num_columns].columns
+    train_num_imp.index = train.index
+    test_num_imp.columns = test[num_columns].columns
+    test_num_imp.index = test.index
 
-    return pd.concat([imputed_data_num, imputed_data_str], axis=1)
+    return pd.concat([train_num_imp, train_str_imp], axis=1), pd.concat([test_num_imp, test_str_imp], axis=1)

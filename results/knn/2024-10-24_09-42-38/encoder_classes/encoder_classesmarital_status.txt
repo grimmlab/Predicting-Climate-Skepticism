@@ -1,0 +1,1 @@
+['Divorced' 'Married' 'Umarried' 'Widowed']

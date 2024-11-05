@@ -26,7 +26,7 @@ class Optimizer:
         self.save_dir = pathlib.Path(
             "results/" + model_name + "/" + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + "/")
 
-    def objective(self, trial: optuna.trial.Trial):
+    def objective(self, trial: optuna.trial.Trial, train_val):
 
         unfitted_model: base_model_.BaseModel = utils.get_mapping_name_to_class()[self.model_name](optuna_trial=trial)
 
@@ -36,19 +36,6 @@ class Optimizer:
 
         print("Params for Trial " + str(trial.number))
         print(trial.params)
-
-        train_val, _ = sklearn.model_selection.train_test_split(self.data, test_size=0.2, random_state=42)
-
-        if unfitted_model.impute:
-            train_val = utils.impute_data(train_val)
-        else:
-            train_val = train_val.dropna()
-
-        train_val = utils.encode_data(train_val, self.save_dir)
-
-        for column in train_val.columns:
-            if train_val[column].dtype == 'O':
-                train_val[column] = train_val[column].astype('category')
 
         objective_values = []
 
@@ -61,6 +48,21 @@ class Optimizer:
                 train_val.iloc[train_indexes[fold]],
                 train_val.iloc[val_indexes[fold]],
             )
+
+            if model.impute:
+                train, val = utils.impute_data(train, val)
+            else:
+                train, val = train.dropna(), val.dropna()
+
+            train = utils.encode_data(train, self.save_dir)
+            val = utils.encode_data(val, self.save_dir)
+
+            for column in train.columns:
+                if train[column].dtype == 'O':
+                    train[column] = train[column].astype('category')
+            for column in val.columns:
+                if val[column].dtype == 'O':
+                    val[column] = val[column].astype('category')
 
             if model.sampling != None:
                 if model.sampling == "over":
@@ -135,7 +137,7 @@ class Optimizer:
         train_val, test = sklearn.model_selection.train_test_split(self.data, test_size=0.2, random_state=42)
 
         study = utils.create_new_study()
-        study.optimize(lambda trial: self.objective(trial=trial), n_trials=100)
+        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=100)
         print("Best matthews correlation score: " + str(study.best_trial.value))
         print("Best hyperparameters: " + str(study.best_params))
 
@@ -149,11 +151,12 @@ class Optimizer:
         final_model = joblib.load(self.save_dir.joinpath('unfitted_model_trial' + str(study.best_trial.number)))
 
         if final_model.impute:
-            train_val = utils.impute_data(train_val)
+            train_val, test = utils.impute_data(train_val, test)
         else:
-            train_val = train_val.dropna()
+            train_val, test = train_val.dropna(), test.dropna()
 
         train_val = utils.encode_data(train_val, self.save_dir)
+        test = utils.encode_data(test, self.save_dir)
 
         for column in train_val.columns:
             if train_val[column].dtype == 'O':
@@ -162,28 +165,6 @@ class Optimizer:
         final_model.retrain(train_val)
 
         joblib.dump(final_model, self.save_dir.joinpath('best_model_' + self.model_name))
-
-        if final_model.impute:
-            imp_str = sklearn.impute.SimpleImputer(strategy="most_frequent")
-            imp_str = imp_str.fit(train_val.select_dtypes(include=['O']))
-            imputed_data_str = pd.DataFrame(imp_str.transform(test.select_dtypes(include=['O'])))
-            imputed_data_str.columns = test.select_dtypes(include=['O']).columns
-            imputed_data_str.index = test.index
-
-            num_columns = [x for x in test.columns.tolist() if
-                           x not in test.select_dtypes(include=['O']).columns.tolist()]
-            imp_num = sklearn.impute.IterativeImputer(
-                random_state=42, estimator=sklearn.ensemble.HistGradientBoostingRegressor())
-            imp_num = imp_num.fit(train_val[num_columns])
-            imputed_data_num = pd.DataFrame(imp_num.transform(test[num_columns]))
-            imputed_data_num.columns = test[num_columns].columns
-            imputed_data_num.index = test.index
-
-            pd.concat([imputed_data_num, imputed_data_str], axis=1)
-        else:
-            test = test.dropna()
-
-        test = utils.encode_data(test, self.save_dir)
 
         for column in test.columns:
             if test[column].dtype == 'O':
@@ -204,15 +185,16 @@ class Optimizer:
         print(disp.confusion_matrix)
 
         plt.show()
-        with open(self.save_dir.joinpath('matthews_corrcoef_xgb' + str(self.to_be_dropped_columns) + '.txt'), 'w') as f:
+        with open(self.save_dir.joinpath('matthews_corrcoef' + str(self.to_be_dropped_columns) + '.txt'), 'w') as f:
             f.write(
                 "matthews_corrcoef: %.2f" % sklearn.metrics.matthews_corrcoef(
                     y_true=test["climatedeniers"], y_pred=predictions))
 
-        feat_import_df = self.get_feature_importance(model=final_model.model)
-        feat_import_df.to_csv(
-            self.save_dir.joinpath(
-                "final_model_feature_importances_" + self.model_name + "_" + str(self.to_be_dropped_columns) + ".csv"),
-            sep=",", decimal=".", float_format="%.10f", index=False)
+        if hasattr(final_model, "feature_importances_"):
+            feat_import_df = self.get_feature_importance(model=final_model.model)
+            feat_import_df.to_csv(
+                self.save_dir.joinpath(
+                    "final_model_feature_importances_" + self.model_name + "_" + str(self.to_be_dropped_columns) + ".csv"),
+                sep=",", decimal=".", float_format="%.10f", index=False)
 
         self.shap(final_model, test)

@@ -1,0 +1,3 @@
+['Fulltime' 'Lehre' 'Other' 'Parttime' 'Pensioner' 'Selfemployed'
+ 'Student (School)' 'Student (Uni)' 'Unemployed, job seeking'
+ 'Unemployed, not job seeking']

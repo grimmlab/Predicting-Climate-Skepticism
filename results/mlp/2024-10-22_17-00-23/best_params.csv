@@ -1,0 +1,13 @@
+sampling,
+sampling_strategy,all
+standardize_X,False
+impute,False
+hidden_layer_sizes,5
+activation,identity
+solver,adam
+alpha,0.0294881022412087
+learning_rate_init,0.002464987520714341
+shuffle,True
+early_stopping,True
+n_iter_no_change,93
+max_iter,2000
