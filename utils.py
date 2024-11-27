@@ -175,6 +175,8 @@ def preprocess_data(to_be_dropped_columns: list = None):
 
     full_data = full_data[full_data.climatedeniers != 2]
 
+    full_data.to_csv("datasets/dataset_preprocessed.csv", index=False)
+
     return full_data
 
 

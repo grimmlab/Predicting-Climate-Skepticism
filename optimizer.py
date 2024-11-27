@@ -88,7 +88,8 @@ class Optimizer:
                     trial_number=trial.number, trial_params=trial.params, reason='model creation: ' + str(exc))
                 raise optuna.exceptions.TrialPruned()
 
-            objective_value = sklearn.metrics.matthews_corrcoef(val["climatedeniers"], y_pred)
+            # objective_value = sklearn.metrics.matthews_corrcoef(val["climatedeniers"], y_pred)
+            objective_value = sklearn.metrics.recall_score(val["climatedeniers"], y_pred, pos_label=0)
 
             objective_values.append(objective_value)
 
@@ -185,10 +186,6 @@ class Optimizer:
         print(disp.confusion_matrix)
 
         plt.show()
-        with open(self.save_dir.joinpath('matthews_corrcoef' + str(self.to_be_dropped_columns) + '.txt'), 'w') as f:
-            f.write(
-                "matthews_corrcoef: %.2f" % sklearn.metrics.matthews_corrcoef(
-                    y_true=test["climatedeniers"], y_pred=predictions))
 
         if hasattr(final_model, "feature_importances_"):
             feat_import_df = self.get_feature_importance(model=final_model.model)
@@ -198,3 +195,8 @@ class Optimizer:
                 sep=",", decimal=".", float_format="%.10f", index=False)
 
         self.shap(final_model, test)
+
+        with open(self.save_dir.joinpath('matthews_corrcoef' + str(self.to_be_dropped_columns) + '.txt'), 'w') as f:
+            f.write(
+                "matthews_corrcoef: %.2f" % sklearn.metrics.matthews_corrcoef(
+                    y_true=test["climatedeniers"], y_pred=predictions))
