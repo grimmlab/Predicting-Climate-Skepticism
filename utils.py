@@ -175,6 +175,9 @@ def preprocess_data(to_be_dropped_columns: list = None):
 
     full_data = full_data[full_data.climatedeniers != 2]
 
+    full_data.drop(list(full_data.filter(regex='^d_')), axis=1, inplace=True)
+    full_data.drop(list(full_data.filter(regex='^e_')), axis=1, inplace=True)
+
     full_data.to_csv("datasets/dataset_preprocessed.csv", index=False)
 
     return full_data
