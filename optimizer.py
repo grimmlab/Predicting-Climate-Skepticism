@@ -88,8 +88,8 @@ class Optimizer:
                     trial_number=trial.number, trial_params=trial.params, reason='model creation: ' + str(exc))
                 raise optuna.exceptions.TrialPruned()
 
-            # objective_value = sklearn.metrics.matthews_corrcoef(val["climatedeniers"], y_pred)
-            objective_value = sklearn.metrics.recall_score(val["climatedeniers"], y_pred, pos_label=0)
+            objective_value = sklearn.metrics.matthews_corrcoef(val["climatedeniers"], y_pred)
+            # objective_value = sklearn.metrics.recall_score(val["climatedeniers"], y_pred, pos_label=0)
 
             objective_values.append(objective_value)
 

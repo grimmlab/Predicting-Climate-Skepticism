@@ -4,4 +4,4 @@
  'Lüneburg' 'Mecklenburg-Vorpommern' 'Mittelfranken' 'Münster'
  'Niederbayern' 'Oberbayern' 'Oberfranken' 'Oberpfalz' 'Rheinhessen-Pfalz'
  'Saarland' 'Sachsen-Anhalt' 'Schleswig-Holstein' 'Schwaben' 'Stuttgart'
- 'Thüringen' 'Trier' 'Tübingen' 'Unterfranken' 'Weser-Ems']
+ 'Thüringen' 'Tübingen' 'Unterfranken' 'Weser-Ems']
