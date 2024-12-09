@@ -1,0 +1,11 @@
+sampling,over
+sampling_strategy,not minority
+standardize_X,False
+impute,False
+max_depth,833
+n_estimators,450
+learning_rate,0.07500000000000001
+subsample,0.2
+colsample_bytree,0.305
+max_leaves,525
+objective,binary:logistic

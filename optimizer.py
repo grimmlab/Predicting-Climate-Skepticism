@@ -52,9 +52,9 @@ class Optimizer:
             else:
                 train, val = train.dropna(), val.dropna()
 
-            train["migration_region"] = train["migration_region"].astype('int')
-
-            val["migration_region"] = val["migration_region"].astype('int')
+            if "migration_region" in train.columns:
+                train["migration_region"] = train["migration_region"].astype('int')
+                val["migration_region"] = val["migration_region"].astype('int')
 
             if model.sampling != None:
                 if model.sampling == "over":
@@ -148,13 +148,13 @@ class Optimizer:
         else:
             train_val, test = train_val.dropna(), test.dropna()
 
-        train_val["migration_region"] = train_val["migration_region"].astype('category')
+        if "migration_region" in train_val.columns:
+            train_val["migration_region"] = train_val["migration_region"].astype('category')
+            test["migration_region"] = test["migration_region"].astype('int')
 
         final_model.retrain(train_val)
 
         joblib.dump(final_model, self.save_dir.joinpath('best_model_' + self.model_name))
-
-        test["migration_region"] = test["migration_region"].astype('int')
 
         predictions = final_model.predict(test)
 
