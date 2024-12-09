@@ -1,0 +1,11 @@
+sampling,over
+sampling_strategy,not minority
+impute,False
+fit_intercept,True
+tol,0.021368329072358756
+solver,saga
+max_iter,200
+warm_start,True
+penalty,l1
+C,1
+l1_ratio,0.4

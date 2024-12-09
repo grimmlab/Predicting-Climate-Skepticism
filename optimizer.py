@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import optuna
-import datetime
 import pathlib
 import shutil
 import csv
@@ -19,12 +18,11 @@ import traceback
 
 class Optimizer:
 
-    def __init__(self, to_be_dropped_columns: list = None, data: pd.DataFrame = None, model_name: str = None):
-        self.to_be_dropped_columns = to_be_dropped_columns
+    def __init__(self, experiment: str = None, data: pd.DataFrame = None, model_name: str = None, save_dir: pathlib.Path = None):
+        self.experiment = experiment
         self.data = data
         self.model_name = model_name
-        self.save_dir = pathlib.Path(
-            "results/" + model_name + "/" + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + "/")
+        self.save_dir = save_dir
 
     def objective(self, trial: optuna.trial.Trial, train_val):
 
@@ -54,15 +52,9 @@ class Optimizer:
             else:
                 train, val = train.dropna(), val.dropna()
 
-            train = utils.encode_data(train, self.save_dir)
-            val = utils.encode_data(val, self.save_dir)
+            train["migration_region"] = train["migration_region"].astype('int')
 
-            for column in train.columns:
-                if train[column].dtype == 'O':
-                    train[column] = train[column].astype('category')
-            for column in val.columns:
-                if val[column].dtype == 'O':
-                    val[column] = val[column].astype('category')
+            val["migration_region"] = val["migration_region"].astype('int')
 
             if model.sampling != None:
                 if model.sampling == "over":
@@ -112,7 +104,7 @@ class Optimizer:
 
     def shap(self, final_model, test):
         explainer = shap.Explainer(final_model.predict, test)
-        shap_values = explainer(test)
+        shap_values = explainer(test, max_evals=1000)
 
         joblib.dump(explainer, self.save_dir.joinpath('explainer.sav'))
 
@@ -131,14 +123,14 @@ class Optimizer:
             f = plt.gcf()
             self.save_dir.joinpath('partial_dependence_plots').mkdir(parents=True, exist_ok=True)
             f.savefig(self.save_dir.joinpath(
-                "partial_dependence_plots/shap.partial_dependence_plot" + feature + ".pdf"), format='pdf',
+                "partial_dependence_plots/shap.partial_dependence_plot_" + feature + ".pdf"), format='pdf',
                 bbox_inches='tight')
 
     def run_optimization(self):
         train_val, test = sklearn.model_selection.train_test_split(self.data, test_size=0.2, random_state=42, stratify=self.data["climatedeniers"])
 
         study = utils.create_new_study()
-        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=100)
+        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=1)
         print("Best matthews correlation score: " + str(study.best_trial.value))
         print("Best hyperparameters: " + str(study.best_params))
 
@@ -156,20 +148,13 @@ class Optimizer:
         else:
             train_val, test = train_val.dropna(), test.dropna()
 
-        train_val = utils.encode_data(train_val, self.save_dir)
-        test = utils.encode_data(test, self.save_dir)
-
-        for column in train_val.columns:
-            if train_val[column].dtype == 'O':
-                train_val[column] = train_val[column].astype('category')
+        train_val["migration_region"] = train_val["migration_region"].astype('category')
 
         final_model.retrain(train_val)
 
         joblib.dump(final_model, self.save_dir.joinpath('best_model_' + self.model_name))
 
-        for column in test.columns:
-            if test[column].dtype == 'O':
-                test[column] = test[column].astype('category')
+        test["migration_region"] = test["migration_region"].astype('int')
 
         predictions = final_model.predict(test)
 
@@ -191,12 +176,12 @@ class Optimizer:
             feat_import_df = self.get_feature_importance(model=final_model.model)
             feat_import_df.to_csv(
                 self.save_dir.joinpath(
-                    "final_model_feature_importances_" + self.model_name + "_" + str(self.to_be_dropped_columns) + ".csv"),
+                    "final_model_feature_importances_" + self.model_name + "_" + self.experiment + ".csv"),
                 sep=",", decimal=".", float_format="%.10f", index=False)
 
         self.shap(final_model, test)
 
-        with open(self.save_dir.joinpath('matthews_corrcoef' + str(self.to_be_dropped_columns) + '.txt'), 'w') as f:
+        with open(self.save_dir.joinpath('matthews_corrcoef' + self.experiment + '.txt'), 'w') as f:
             f.write(
                 "matthews_corrcoef: %.2f" % sklearn.metrics.matthews_corrcoef(
                     y_true=test["climatedeniers"], y_pred=predictions))

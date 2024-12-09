@@ -1,9 +1,14 @@
 import optimizer
 import utils
+import pathlib
+import datetime
 
-def run(to_be_dropped_columns: list = None, model_name: str = None):
+def run(experiment: str = None, model_name: str = None):
 
-    data = utils.preprocess_data(to_be_dropped_columns=to_be_dropped_columns)
+    save_dir = pathlib.Path(
+        "results/" + model_name + "/" + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + "/")
 
-    optimizer_run = optimizer.Optimizer(to_be_dropped_columns=to_be_dropped_columns, data=data, model_name=model_name)
+    data = utils.preprocess_data(experiment=experiment, save_dir=save_dir)
+
+    optimizer_run = optimizer.Optimizer(experiment=experiment, data=data, model_name=model_name, save_dir=save_dir)
     optimizer_run.run_optimization()
