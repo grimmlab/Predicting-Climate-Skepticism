@@ -52,10 +52,6 @@ class Optimizer:
             else:
                 train, val = train.dropna(), val.dropna()
 
-            if "migration_region" in train.columns:
-                train["migration_region"] = train["migration_region"].astype('int')
-                val["migration_region"] = val["migration_region"].astype('int')
-
             if model.sampling != None:
                 if model.sampling == "over":
                     sampler = imblearn.over_sampling.RandomOverSampler(
@@ -130,7 +126,7 @@ class Optimizer:
         train_val, test = sklearn.model_selection.train_test_split(self.data, test_size=0.2, random_state=42, stratify=self.data["climatedeniers"])
 
         study = utils.create_new_study()
-        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=1)
+        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=100)
         print("Best matthews correlation score: " + str(study.best_trial.value))
         print("Best hyperparameters: " + str(study.best_params))
 
@@ -147,10 +143,6 @@ class Optimizer:
             train_val, test = utils.impute_data(train_val, test)
         else:
             train_val, test = train_val.dropna(), test.dropna()
-
-        if "migration_region" in train_val.columns:
-            train_val["migration_region"] = train_val["migration_region"].astype('category')
-            test["migration_region"] = test["migration_region"].astype('int')
 
         final_model.retrain(train_val)
 

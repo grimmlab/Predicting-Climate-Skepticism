@@ -13,7 +13,9 @@ from sklearn.experimental import enable_iterative_imputer
 
 def encode_data(data, save_dir, experiment):
 
-    if experiment != 'wo_personal':
+    if experiment != 'wo_personal' and experiment != 'climate_belief_score':
+
+
         # PERSONAL_DATA
         ## Ordinal enconding
         encoder = OrdinalEncoder(categories=[["low", "middle", "high"]])
@@ -37,6 +39,7 @@ def encode_data(data, save_dir, experiment):
              'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']],
             handle_unknown="use_encoded_value", unknown_value=np.nan)
         data["innovation"] = encoder.fit_transform(data[["innovation"]])
+
         ## Replacement of certain values
         data["subject_well_being"] = (
             data["subject_well_being"].replace(["Completely satisfied", "Not satisfied at all"], [1, 10]).astype(float))
@@ -44,9 +47,10 @@ def encode_data(data, save_dir, experiment):
             ['Neud', 'Weiß', 'KEIN', 'weiß', 'Gieß', '40Ja', 'Y200', 'Deut', 'nein', 'Acht', 'Gar ', '197q', 'kein', 'fünf',
              'xxxx', '75 J', '10 j', "Germ", "oooo", '000/', "19i8", "Draw", '1ß65', "Oooo", '2oo6'],
             [0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
-             0000, 0000, 0000, 0000, 1965, 0000, 2006]))
+             0000, 0000, 0000, 0000, 1965, 0000, 2006])).astype(float)
         data["children"] = (
             data["children"].replace(["none", "5 or more"], [0, 6]).astype(float))
+
         ## Label encoding
         label_cols_personal = \
             ["plz", "migration_b_g_city", "migration_s_g_city", "migration_b_g_state", "migration_b_g_nuts2",
@@ -58,6 +62,15 @@ def encode_data(data, save_dir, experiment):
             save_dir.joinpath('encoder_classes').mkdir(parents=True, exist_ok=True)
             with open(save_dir.joinpath('encoder_classes/encoder_classes' + col + '.txt'), 'w') as f:
                 f.write(str(encoder.classes_))
+
+        ## add east/west germany
+        data["east_germany"] = 0
+        data["east_germany"][data["state"] == "Brandenburg"] = 1
+        data["east_germany"][data["state"] == "Mecklenburg-Western Pommerania"] = 1
+        data["east_germany"][data["state"] == "Thuringia"] = 1
+        data["east_germany"][data["state"] == "Saxony"] = 1
+        data["east_germany"][data["state"] == "Saxony-Anhalt"] = 1
+
         ## one hot encoding
         data = pd.get_dummies(data, columns=["religion"], dtype=int)
         data = pd.get_dummies(data, columns=["politics_vote"], dtype=int)
@@ -69,6 +82,7 @@ def encode_data(data, save_dir, experiment):
         data = pd.get_dummies(data, columns=["job_field_group"], dtype=int)
         data = pd.get_dummies(data, columns=["nuts2"], dtype=int)
         data = pd.get_dummies(data, columns=["district"], dtype=int)
+
 
         # MORAL VALUES
         ## Ordinal encoding
@@ -94,6 +108,7 @@ def encode_data(data, save_dir, experiment):
                  'Completely agree']])
             data[col] = encoder.fit_transform(data[[col]])
 
+
         # BASELINE_BELIEFS
         ## Ordinal encoding
         ordinal_cols_b_q = ["b_q1_own_opinion", "b_q1_point_guess", "b_q2_population", "b_q2_point_guess"]
@@ -103,9 +118,11 @@ def encode_data(data, save_dir, experiment):
                  'Completely suport']], handle_unknown="use_encoded_value", unknown_value=np.nan)
             data[col] = encoder.fit_transform(data[[col]])
 
+
         # BIOECONOMY
         ## Replacement of certain values
         data["bioecon_prod_all"] = data["bioecon_prod_all"].replace(",", "", regex=True).astype(int)
+
         ## Label encoding
         label_cols_bioeconomy = \
             ["bioecon_prod_cleaning", "bioecon_prod_cosmetics", "bioecon_prod_furniture", "bioecon_prod_dishes",
@@ -119,6 +136,7 @@ def encode_data(data, save_dir, experiment):
             with open(save_dir.joinpath('encoder_classes/encoder_classes' + col + '.txt'), 'w') as f:
                 f.write(str(encoder.classes_))
 
+
         # ADDITIONAL_VARIABLES
         ## Ordinal encoding
         encoder = OrdinalEncoder(categories=[
@@ -128,9 +146,11 @@ def encode_data(data, save_dir, experiment):
             ["Strongly decrease", "Slightly decrease", "No change", "Slightly increase", "Strongly increase"]])
         data["soc_inequ_climate"] = encoder.fit_transform(data[["soc_inequ_climate"]])
 
+
         # EMBEDDED_DATA
         ## Replacement of certain values
         data["unemployment_rate"] = data["unemployment_rate"].replace(",", "", regex=True).astype(int)
+
 
     if experiment in ['full', 'climate_eurobarometer', 'wo_personal']:
         # CLIMATE_EUROBAROMETER
@@ -243,7 +263,7 @@ def get_mapping_name_to_class() -> dict:
     return modules_mapped
 
 
-def preprocess_data(experiment: str = None, save_dir: pathlib.Path = None) -> pd.DataFrame:
+def preprocess_data(experiment: str = None, climate_belief_score: bool = None, save_dir: pathlib.Path = None) -> pd.DataFrame:
 
     full_data = pd.read_csv("datasets/Climate_Deniers_24_10_15.csv", low_memory=False)
 
@@ -265,7 +285,8 @@ def preprocess_data(experiment: str = None, save_dir: pathlib.Path = None) -> pd
         "region_prefix", "adequacy", "goal", "socialpref_index", "socialpref_index2", "socialpref_index",
         "PERSONAL_DATA", "BASELINE_BELIEFS", "BASELINE_ECON_INDICATORS", "CLIMATE_EUROBAROMETER", "CLIMATE_KNOWLEDGE",
         "CLIMATE_POLICIES_ACTIONS", "CLIMATE_TRUST", "BIOECONOMY", "MORAL_VALUES", "ADDITIONAL_VARIABLES",
-        "EMBEDDED_DATA", "religion_islam", "religion_christian", "migration_b_country", "migration_s_country"]
+        "EMBEDDED_DATA", "religion_islam", "religion_christian", "migration_b_country", "migration_s_country",
+        "socialpref_index", "socialpref_index2", "socialpref_index3"]
 
     personal = [
         "gender", "age", "income_group", "income_section", "state", "nuts2", "district", "plz", "education",
@@ -326,7 +347,7 @@ def preprocess_data(experiment: str = None, save_dir: pathlib.Path = None) -> pd
         "climate_trust_state_gov", "climate_trust_nat_gov", "climate_trust_companies", "climate_trust_scientist",
         "climate_trust_un", "climate_trust_eu"]
 
-    cols_dict = {"climate_eurbarometer": 0,
+    cols_dict = {"climate_eurobarometer": 0,
                  "climate_knowledge": 1,
                  "climate_policies_actions": 2,
                  "climate_trust": 3}
@@ -335,11 +356,17 @@ def preprocess_data(experiment: str = None, save_dir: pathlib.Path = None) -> pd
         if experiment == "wo_personal":
             to_be_dropped_cols.extend(personal)
         else:
-            list_of_cols.pop(cols_dict[experiment])
+            if experiment != "wo_climate":
+                list_of_cols.pop(cols_dict[experiment])
             for experiment_cols in list_of_cols:
                 to_be_dropped_cols.extend(experiment_cols)
 
-    full_data = full_data.drop(columns=to_be_dropped_cols, axis=1)
+    if experiment != "climate_belief_score":
+        full_data = full_data.drop(columns=to_be_dropped_cols, axis=1)
+        if not climate_belief_score :
+            full_data = full_data.drop(columns=["climate_belief_score"], axis=1)
+    else:
+        full_data = full_data[["climate_belief_score", "climatedeniers"]]
 
     full_data = encode_data(full_data, save_dir, experiment)
 
@@ -349,14 +376,16 @@ def preprocess_data(experiment: str = None, save_dir: pathlib.Path = None) -> pd
 
 
 def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None):
-
-    imp_str = sklearn.impute.SimpleImputer(strategy="most_frequent").fit(train.select_dtypes(include=['O']))
-    train_str_imp = pd.DataFrame(imp_str.transform(train.select_dtypes(include=['O'])))
-    test_str_imp = pd.DataFrame(imp_str.transform(test.select_dtypes(include=['O'])))
-    train_str_imp.columns = train.select_dtypes(include=['O']).columns
-    train_str_imp.index = train.index
-    test_str_imp.columns = test.select_dtypes(include=['O']).columns
-    test_str_imp.index = test.index
+    train_str_imp = pd.DataFrame(train.select_dtypes(include=['O']))
+    test_str_imp = pd.DataFrame(test.select_dtypes(include=['O']))
+    if train.select_dtypes(include=['O']).size > 0:
+        imp_str = sklearn.impute.SimpleImputer(strategy="most_frequent").fit(train.select_dtypes(include=['O']))
+        train_str_imp = pd.DataFrame(imp_str.transform(train_str_imp))
+        test_str_imp = pd.DataFrame(imp_str.transform(test_str_imp))
+        train_str_imp.columns = train.select_dtypes(include=['O']).columns
+        train_str_imp.index = train.index
+        test_str_imp.columns = test.select_dtypes(include=['O']).columns
+        test_str_imp.index = test.index
 
     num_columns = [x for x in train.columns.tolist() if x not in train.select_dtypes(include=['O']).columns.tolist()]
     imp_num = sklearn.impute.IterativeImputer(
