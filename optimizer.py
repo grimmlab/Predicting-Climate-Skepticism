@@ -126,7 +126,7 @@ class Optimizer:
         train_val, test = sklearn.model_selection.train_test_split(self.data, test_size=0.2, random_state=42, stratify=self.data["climatedeniers"])
 
         study = utils.create_new_study()
-        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=100)
+        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=2)
         print("Best matthews correlation score: " + str(study.best_trial.value))
         print("Best hyperparameters: " + str(study.best_params))
 

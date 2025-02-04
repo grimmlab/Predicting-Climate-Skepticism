@@ -289,9 +289,9 @@ def preprocess_data(experiment: str = None, climate_belief_score: bool = None, s
         "socialpref_index", "socialpref_index2", "socialpref_index3"]
 
     personal = [
-        "gender", "age", "income_group", "income_section", "state", "nuts2", "district", "plz", "education",
-        "marital_status", "children", "job", "job_field_maingroup", "job_field_group", "religion", "religion_practice",
-        "religion_christian", "religion_islam", "migration_b_germany", "migration_b_g_city",
+        "gender", "age", "income_group", "income_section", "state", "east_germany", "nuts2", "district", "plz",
+        "education", "marital_status", "children", "job", "job_field_maingroup", "job_field_group", "religion",
+        "religion_practice", "religion_christian", "religion_islam", "migration_b_germany", "migration_b_g_city",
         "migration_b_g_state", "migration_b_g_nuts2", "migration_b_g_district", "migration_b_country",
         "migration_s_germany", "migration_s_g_city", "migration_s_g_state", "migration_s_g_nuts2",
         "migration_s_g_district", "migration_s_country", "migration_region", "subject_well_being", "innovation",
