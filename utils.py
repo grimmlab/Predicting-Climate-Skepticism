@@ -63,14 +63,6 @@ def encode_data(data, save_dir, experiment):
             with open(save_dir.joinpath('encoder_classes/encoder_classes' + col + '.txt'), 'w') as f:
                 f.write(str(encoder.classes_))
 
-        ## add east/west germany
-        data["east_germany"] = 0
-        data["east_germany"][data["state"] == "Brandenburg"] = 1
-        data["east_germany"][data["state"] == "Mecklenburg-Western Pommerania"] = 1
-        data["east_germany"][data["state"] == "Thuringia"] = 1
-        data["east_germany"][data["state"] == "Saxony"] = 1
-        data["east_germany"][data["state"] == "Saxony-Anhalt"] = 1
-
         ## one hot encoding
         data = pd.get_dummies(data, columns=["religion"], dtype=int)
         data = pd.get_dummies(data, columns=["politics_vote"], dtype=int)
@@ -279,6 +271,14 @@ def preprocess_data(experiment: str = None, climate_belief_score: bool = None, s
 
     full_data["job_field_maingroup"][full_data["job_field_group"] == "Keine Angabe"] = (
         full_data[full_data["job_field_group"] == "Keine Angabe"]["job_field_maingroup"].replace(np.nan, "Keine Angabe"))
+
+    ## add east/west germany
+    full_data["east_germany"] = 0
+    full_data["east_germany"][full_data["state"] == "Brandenburg"] = 1
+    full_data["east_germany"][full_data["state"] == "Mecklenburg-Western Pommerania"] = 1
+    full_data["east_germany"][full_data["state"] == "Thuringia"] = 1
+    full_data["east_germany"][full_data["state"] == "Saxony"] = 1
+    full_data["east_germany"][full_data["state"] == "Saxony-Anhalt"] = 1
 
     to_be_dropped_cols = [
         "climate_state_manmade", "attention_check_1", "attention_check_2", "attention1_d", "attention2_d",
