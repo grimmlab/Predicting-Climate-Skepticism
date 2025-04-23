@@ -100,10 +100,6 @@ class BaseModel(abc.ABC):
     def common_hyperparams():
 
         return {
-            'impute': {
-                'datatype': 'categorical',
-                'list_of_values': [True, False],
-            },
             'standardize_X': {
                 'datatype': 'categorical',
                 'list_of_values': [True, False],

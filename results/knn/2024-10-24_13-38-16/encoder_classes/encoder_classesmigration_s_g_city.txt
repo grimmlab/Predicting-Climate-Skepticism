@@ -1,2 +1,0 @@
-['Aachen' 'Aachen Burtscheid' 'Aalen' ... 'Überau' 'Überlingen'
- 'Üdersdorf']

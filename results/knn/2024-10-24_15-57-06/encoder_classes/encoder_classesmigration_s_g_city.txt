@@ -1,1 +1,0 @@
-['Aachen' 'Aalen' 'Adelebsen' ... 'Zülpich' 'Ükermünde' 'Ürzig']

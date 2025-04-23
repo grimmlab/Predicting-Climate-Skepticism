@@ -1,1 +1,0 @@
-['AfD' 'Bündnis 90/Die Grünen' 'CDU/CSU' 'Die Linke' 'FDP' 'Other' 'SPD']

@@ -1,5 +1,4 @@
 import pathlib
-
 import numpy as np
 from sklearn.preprocessing import OrdinalEncoder, LabelEncoder
 import sklearn
@@ -11,12 +10,16 @@ import inspect
 import importlib
 from sklearn.experimental import enable_iterative_imputer
 
-def encode_data(data, save_dir, experiment):
+def encode_data(data, save_dir, featuresets, dependent_variable):
 
-    if experiment != 'wo_personal' and experiment != 'climate_belief_score':
+    if dependent_variable == "climatedeniers":
+        data["climatedeniers"] = data["climatedeniers"].replace(["moderate", "climate_denier"], [0, 1])
+    if dependent_variable == "climate_eb_problem":
+        data["climate_eb_problem"] = (
+            data["climate_eb_problem"].replace(["No serious problem at all", "A very serious problem"], [1, 10]))
 
+    if "PERSONAL_DATA" in featuresets:
 
-        # PERSONAL_DATA
         ## Ordinal enconding
         encoder = OrdinalEncoder(categories=[["low", "middle", "high"]])
         data["income_group"] = encoder.fit_transform(data[["income_group"]])
@@ -30,53 +33,104 @@ def encode_data(data, save_dir, experiment):
             ["Keine Angabe", "Other", "No degree", "Hauptschule", "Realschule", "Abitur", "Lehre", "Hochschule",
              "Doktor, Habilitation"]], handle_unknown="use_encoded_value", unknown_value=np.nan)
         data["education"] = encoder.fit_transform(data[["education"]])
-        encoder = (OrdinalEncoder(categories=[
-            ['Keine Angabe', 'Never', 'Less frequently', 'Several times a year', 'One too three times a month',
-             'Once a week', 'More than once a week']], handle_unknown="use_encoded_value", unknown_value=np.nan))
-        data["religion_practice"] = encoder.fit_transform(data[["religion_practice"]])
         encoder = OrdinalEncoder(categories=[
-            ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
-             'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']],
-            handle_unknown="use_encoded_value", unknown_value=np.nan)
-        data["innovation"] = encoder.fit_transform(data[["innovation"]])
+            ["Very unimportant", "Unimportant", "Neither unimportant nor important", "Important", "Very important"]])
+        data["politics_climate"] = encoder.fit_transform(data[["politics_climate"]])
+        encoder = OrdinalEncoder(categories=[
+            ["Strongly decrease", "Slightly decrease", "No change", "Slightly increase", "Strongly increase"]])
+        data["soc_inequ_climate"] = encoder.fit_transform(data[["soc_inequ_climate"]])
 
         ## Replacement of certain values
         data["subject_well_being"] = (
             data["subject_well_being"].replace(["Completely satisfied", "Not satisfied at all"], [1, 10]).astype(float))
-        data['migration_region'] = (data['migration_region'].replace(
-            ['Neud', 'Weiß', 'KEIN', 'weiß', 'Gieß', '40Ja', 'Y200', 'Deut', 'nein', 'Acht', 'Gar ', '197q', 'kein', 'fünf',
-             'xxxx', '75 J', '10 j', "Germ", "oooo", '000/', "19i8", "Draw", '1ß65', "Oooo", '2oo6'],
-            [0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
-             0000, 0000, 0000, 0000, 1965, 0000, 2006])).astype(float)
-        data["children"] = (
-            data["children"].replace(["none", "5 or more"], [0, 6]).astype(float))
+        data["children"] = data["children"].replace(["none", "5 or more"], [0, 6]).astype(float)
 
         ## Label encoding
-        label_cols_personal = \
-            ["plz", "migration_b_g_city", "migration_s_g_city", "migration_b_g_state", "migration_b_g_nuts2",
-             "migration_b_g_district", "migration_s_g_state", "migration_s_g_nuts2", "migration_s_g_district",
-             "migration_b_germany", "migration_s_germany",  "b_q1_attention", "b_q2_attention"]
+        label_cols_personal = ["migration_b_germany", "religious", "eastger", "unemployment"]
         for col in label_cols_personal:
+            encoder = LabelEncoder()
+            data[col] = (encoder.fit_transform(data[[col]]))
+            save_dir.joinpath('encoder_classes').mkdir(parents=True, exist_ok=True)
+            with open(save_dir.joinpath(f'encoder_classes/encoder_classes_{col}.txt'), 'w') as f:
+                f.write(str(encoder.classes_))
+
+        ## one hot encoding
+        data = pd.get_dummies(data, columns=["politics_vote"], dtype=int)
+        data = pd.get_dummies(data, columns=["job"], dtype=int)
+        data = pd.get_dummies(data, columns=["gender"], dtype=int)
+
+    if "CLIMATE_EUROBAROMETER" in featuresets:
+
+        ## Ordinal encoding
+        encoder = OrdinalEncoder(categories=[['Not at all', 'Very little', 'Little', 'Much', 'Very much']])
+        data["climate_know"] = encoder.fit_transform(data[["climate_know"]])
+        ordinal_cols_climate_eb = ["climate_eb_renewable", "climate_eb_efficient", "climate_eb_ets"]
+        for col in ordinal_cols_climate_eb:
+            encoder = OrdinalEncoder(categories=[
+                ["Not at all important", "Not very important", "Fairly important", "Very important"]])
+            data[col] = encoder.fit_transform(data[[col]])
+        ordinal_cols_eb = \
+            ["climate_eb_state_expertise", "climate_eb_state_energy_security", "climate_eb_state_innovation",
+             "climate_eb_state_transition", "climate_eb_state_pos_outcome", "climate_eb_state_min_emissions"]
+        for col in ordinal_cols_eb:
+            encoder = OrdinalEncoder(categories=[
+                ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
+                 'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
+            data[col] = encoder.fit_transform(data[[col]])
+
+    if "CLIMATE_KNOWLEDGE" in featuresets:
+
+        ## Ordinal encoding
+        encoder = OrdinalEncoder(categories=[["Very low", "Rather low", "Rather high", "Very high"]])
+        data["climate_risk"] = (encoder.fit_transform(data[["climate_risk"]]))
+        ordinal_cols_climate_state = \
+            ["climate_state_worry", "climate_state_damage", "climate_state_adhere_goal","climate_state_together",
+             "climate_state_single_person", "climate_state_forecasts", "climate_state_disagree",
+             "climate_state_convinced", "climate_state_media", "climate_state_children",
+             "climate_state_extreme_weather", ]
+        for col in ordinal_cols_climate_state:
+            encoder = OrdinalEncoder(categories=[
+                ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
+                 'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
+            data[col] = encoder.fit_transform(data[[col]])
+
+    if "CLIMATE_POLICIES_ACTIONS" in featuresets:
+
+        ## Ordinal encoding
+        ordinal_cols_policies = \
+            ["climate_policies_fund_research", "climate_policies_stop_coal", "climate_policies_carbon_tax",
+             "climate_policies_tax_rabates"]
+        for col in ordinal_cols_policies:
+            encoder = OrdinalEncoder(categories=[
+                ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
+                 'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
+            data[col] = encoder.fit_transform(data[[col]])
+        ordinal_cols_climate_actions = \
+            ["climate_actions_public_display", "climate_actions_donate", "climate_actions_volunteer",
+             "climate_actions_discuss", "climate_actions_protest", "climate_actions_contact_news",
+             "climate_actions_social_media"]
+        for col in ordinal_cols_climate_actions:
+            encoder = OrdinalEncoder(categories=[
+                ['Definitely would not', 'Probably would not', 'Probably would', 'Definitely would', 'Already doing this']])
+            data[col] = encoder.fit_transform(data[[col]])
+
+    if "BIOECONOMY" in featuresets:
+
+        ## Label encoding
+        label_cols_bioeconomy = \
+            ["bioecon_prod_clothes", "bioecon_prod_cleaning", "bioecon_prod_cosmetics", "bioecon_prod_furniture",
+             "bioecon_prod_dishes", "bioecon_prod_bags", "bioecon_prod_dispos_dish", "bioecon_prod_packaging",
+             "bioecon_prod_wood","bioecon_prod_building", "bioecon_prod_trashbags", "bioecon_prod_none",
+             "bioecon_prod_other"]
+        for col in label_cols_bioeconomy:
             encoder = LabelEncoder()
             data[col] = (encoder.fit_transform(data[[col]]))
             save_dir.joinpath('encoder_classes').mkdir(parents=True, exist_ok=True)
             with open(save_dir.joinpath('encoder_classes/encoder_classes' + col + '.txt'), 'w') as f:
                 f.write(str(encoder.classes_))
 
-        ## one hot encoding
-        data = pd.get_dummies(data, columns=["religion"], dtype=int)
-        data = pd.get_dummies(data, columns=["politics_vote"], dtype=int)
-        data = pd.get_dummies(data, columns=["gender"], dtype=int)
-        data = pd.get_dummies(data, columns=["marital_status"], dtype=int)
-        data = pd.get_dummies(data, columns=["job"], dtype=int)
-        data = pd.get_dummies(data, columns=["state"], dtype=int)
-        data = pd.get_dummies(data, columns=["job_field_maingroup"], dtype=int)
-        data = pd.get_dummies(data, columns=["job_field_group"], dtype=int)
-        data = pd.get_dummies(data, columns=["nuts2"], dtype=int)
-        data = pd.get_dummies(data, columns=["district"], dtype=int)
+    if "MORAL_VALUES" in featuresets:
 
-
-        # MORAL VALUES
         ## Ordinal encoding
         ordinal_cols_moral_rel = \
             ["moral_rel_suffering", "moral_rel_treat_diff", "moral_rel_love_country", "moral_rel_lack_respect",
@@ -98,120 +152,6 @@ def encode_data(data, save_dir, experiment):
                 ['Completely disagree', 'Slightly disagree', 'Moderately disagree', 'Slightly agree',
                  'Moderately agree',
                  'Completely agree']])
-            data[col] = encoder.fit_transform(data[[col]])
-
-
-        # BASELINE_BELIEFS
-        ## Ordinal encoding
-        ordinal_cols_b_q = ["b_q1_own_opinion", "b_q1_point_guess", "b_q2_population", "b_q2_point_guess"]
-        for col in ordinal_cols_b_q:
-            encoder = OrdinalEncoder(categories=[
-                ['Keine Angabe', 'Completely oppose', 'Rather oppose', 'Neither oppose nor suport', 'Rather suport',
-                 'Completely suport']], handle_unknown="use_encoded_value", unknown_value=np.nan)
-            data[col] = encoder.fit_transform(data[[col]])
-
-
-        # BIOECONOMY
-        ## Replacement of certain values
-        data["bioecon_prod_all"] = data["bioecon_prod_all"].replace(",", "", regex=True).astype(int)
-
-        ## Label encoding
-        label_cols_bioeconomy = \
-            ["bioecon_prod_cleaning", "bioecon_prod_cosmetics", "bioecon_prod_furniture", "bioecon_prod_dishes",
-             "bioecon_prod_bags", "bioecon_prod_dispos_dish", "bioecon_prod_packaging", "bioecon_prod_wood",
-             "bioecon_prod_trashbags", "bioecon_prod_clothes", "bioecon_prod_building", "bioecon_prod_none",
-             "bioecon_prod_other"]
-        for col in label_cols_bioeconomy:
-            encoder = LabelEncoder()
-            data[col] = (encoder.fit_transform(data[[col]]))
-            save_dir.joinpath('encoder_classes').mkdir(parents=True, exist_ok=True)
-            with open(save_dir.joinpath('encoder_classes/encoder_classes' + col + '.txt'), 'w') as f:
-                f.write(str(encoder.classes_))
-
-
-        # ADDITIONAL_VARIABLES
-        ## Ordinal encoding
-        encoder = OrdinalEncoder(categories=[
-            ["Very unimportant", "Unimportant", "Neither unimportant nor important", "Important", "Very important"]])
-        data["politics_climate"] = encoder.fit_transform(data[["politics_climate"]])
-        encoder = OrdinalEncoder(categories=[
-            ["Strongly decrease", "Slightly decrease", "No change", "Slightly increase", "Strongly increase"]])
-        data["soc_inequ_climate"] = encoder.fit_transform(data[["soc_inequ_climate"]])
-
-
-        # EMBEDDED_DATA
-        ## Replacement of certain values
-        data["unemployment_rate"] = data["unemployment_rate"].replace(",", "", regex=True).astype(int)
-
-
-    if experiment in ['full', 'climate_eurobarometer', 'wo_personal']:
-        # CLIMATE_EUROBAROMETER
-        ## Ordinal encoding
-        encoder = OrdinalEncoder(categories=[['Not at all', 'Very little', 'Little', 'Much', 'Very much']])
-        data["climate_know"] = encoder.fit_transform(data[["climate_know"]])
-        ordinal_cols_eb = \
-            ["climate_eb_state_expertise", "climate_eb_state_energy_security", "climate_eb_state_innovation",
-             "climate_eb_state_transition", "climate_eb_state_pos_outcome", "climate_eb_state_min_emissions"]
-        for col in ordinal_cols_eb:
-            encoder = OrdinalEncoder(categories=[
-                ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
-                 'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
-            data[col] = encoder.fit_transform(data[[col]])
-        ordinal_cols_climate_eb = ["climate_eb_renewable", "climate_eb_efficient", "climate_eb_ets"]
-        for col in ordinal_cols_climate_eb:
-            encoder = OrdinalEncoder(categories=[
-                ["Not at all important", "Not very important", "Fairly important", "Very important"]])
-            data[col] = encoder.fit_transform(data[[col]])
-        ## Replacement of certain values
-        data["climate_eb_problem"].replace("A very serious problem", int(10), inplace=True)
-        data["climate_eb_problem"].replace("No serious problem at all", int(1), inplace=True)
-        data["climate_eb_problem"] = data["climate_eb_problem"].astype("float")
-        data["climate_eb_resp_all"] = data["climate_eb_resp_all"].replace(",", "", regex=True).astype(int)
-        ## Label encoding
-        label_cols_eb = \
-                ["climate_eb_resp_nat_gov", "climate_eb_resp_eu", "climate_eb_resp_reg_gov", "climate_eb_resp_industry",
-                 "climate_eb_resp_self", "climate_eb_resp_dont_know", "climate_eb_resp_activists", "climate_eb_resp_other",
-                 "climate_eb_resp_nobody"]
-        for col in label_cols_eb:
-            encoder = LabelEncoder()
-            data[col] = (encoder.fit_transform(data[[col]]))
-            save_dir.joinpath('encoder_classes').mkdir(parents=True, exist_ok=True)
-            with open(save_dir.joinpath('encoder_classes/encoder_classes' + col + '.txt'), 'w') as f:
-                f.write(str(encoder.classes_))
-
-    if experiment in ['full', 'climate_knowledge', 'wo_personal']:
-        # CLIMATE_KNOWLEDGE
-        ## Ordinal encoding
-        encoder = OrdinalEncoder(categories=[["Very low", "Rather low", "Rather high", "Very high"]])
-        data["climate_risk"] = (encoder.fit_transform(data[["climate_risk"]]))
-        ordinal_cols_climate_state = \
-            ["climate_state_worry", "climate_state_damage", "climate_state_adhere_goal", "climate_state_single_person",
-             "climate_state_forecasts", "climate_state_disagree", "climate_state_convinced", "climate_state_media",
-             "climate_state_children", "climate_state_extreme_weather", "climate_state_together",]
-        for col in ordinal_cols_climate_state:
-            encoder = OrdinalEncoder(categories=[
-                ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
-                 'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
-            data[col] = encoder.fit_transform(data[[col]])
-
-    if experiment in ['full', 'climate_policies_actions', 'wo_personal']:
-        # CLIMATE_POLICIES_ACTIONS
-        ## Ordinal encoding
-        ordinal_cols_climate_actions = \
-            ["climate_actions_public_display", "climate_actions_donate", "climate_actions_volunteer",
-             "climate_actions_discuss", "climate_actions_protest", "climate_actions_contact_news",
-             "climate_actions_social_media"]
-        for col in ordinal_cols_climate_actions:
-            encoder = OrdinalEncoder(categories=[
-                ['Definitely would not', 'Probably would not', 'Probably would', 'Definitely would', 'Already doing this']])
-            data[col] = encoder.fit_transform(data[[col]])
-        ordinal_cols_policies = \
-            ["climate_policies_fund_research", "climate_policies_carbon_tax", "climate_policies_tax_rabates",
-             "climate_policies_stop_coal"]
-        for col in ordinal_cols_policies:
-            encoder = OrdinalEncoder(categories=[
-                ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
-                 'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
             data[col] = encoder.fit_transform(data[[col]])
 
     return data
@@ -255,120 +195,76 @@ def get_mapping_name_to_class() -> dict:
     return modules_mapped
 
 
-def preprocess_data(experiment: str = None, climate_belief_score: bool = None, save_dir: pathlib.Path = None) -> pd.DataFrame:
+def preprocess_data(
+        save_dir: pathlib.Path = None, dependent_variable: str = None, featuresets: list = None) -> pd.DataFrame:
 
-    full_data = pd.read_csv("datasets/Climate_Deniers_24_10_15.csv", low_memory=False)
+    usecols = [dependent_variable]
 
-    full_data["climatedeniers"] = 2
-    full_data["climatedeniers"][full_data["climate_state_manmade"] == "Completely disagree"] = 1
-    full_data["climatedeniers"][full_data["climate_state_manmade"] == "Rather disagree"] = 1
-    full_data["climatedeniers"][full_data["climate_state_manmade"] == "Completely agree"] = 0
-    full_data["climatedeniers"][full_data["climate_state_manmade"] == "Rather agree"] = 0
-
-    full_data.drop(list(full_data.filter(regex='^d_')), axis=1, inplace=True)
-    full_data.drop(list(full_data.filter(regex='^e_')), axis=1, inplace=True)
-    full_data.drop(list(full_data.filter(regex='^b_ad_')), axis=1, inplace=True)
-
-    full_data["job_field_maingroup"][full_data["job_field_group"] == "Keine Angabe"] = (
-        full_data[full_data["job_field_group"] == "Keine Angabe"]["job_field_maingroup"].replace(np.nan, "Keine Angabe"))
-
-    ## add east/west germany
-    full_data["east_germany"] = 0
-    full_data["east_germany"][full_data["state"] == "Brandenburg"] = 1
-    full_data["east_germany"][full_data["state"] == "Mecklenburg-Western Pommerania"] = 1
-    full_data["east_germany"][full_data["state"] == "Thuringia"] = 1
-    full_data["east_germany"][full_data["state"] == "Saxony"] = 1
-    full_data["east_germany"][full_data["state"] == "Saxony-Anhalt"] = 1
-
-    to_be_dropped_cols = [
-        "climate_state_manmade", "attention_check_1", "attention_check_2", "attention1_d", "attention2_d",
-        "region_prefix", "adequacy", "goal", "socialpref_index", "socialpref_index2", "socialpref_index",
-        "PERSONAL_DATA", "BASELINE_BELIEFS", "BASELINE_ECON_INDICATORS", "CLIMATE_EUROBAROMETER", "CLIMATE_KNOWLEDGE",
-        "CLIMATE_POLICIES_ACTIONS", "CLIMATE_TRUST", "BIOECONOMY", "MORAL_VALUES", "ADDITIONAL_VARIABLES",
-        "EMBEDDED_DATA", "religion_islam", "religion_christian", "migration_b_country", "migration_s_country",
-        "socialpref_index", "socialpref_index2", "socialpref_index3"]
-
-    personal = [
-        "gender", "age", "income_group", "income_section", "state", "east_germany", "nuts2", "district", "plz",
-        "education", "marital_status", "children", "job", "job_field_maingroup", "job_field_group", "religion",
-        "religion_practice", "religion_christian", "religion_islam", "migration_b_germany", "migration_b_g_city",
-        "migration_b_g_state", "migration_b_g_nuts2", "migration_b_g_district", "migration_b_country",
-        "migration_s_germany", "migration_s_g_city", "migration_s_g_state", "migration_s_g_nuts2",
-        "migration_s_g_district", "migration_s_country", "migration_region", "subject_well_being", "innovation",
-        "b_q1_own_opinion", "b_q1_point_guess", "b_q1_attention", "b_q1_dist_com_oppose", "b_q1_dist_rath_oppose",
-        "b_q1_dist_neither", "b_q1_dist_rath_support", "b_q1_dist_com_support", "b_q2_population", "b_q2_point_guess",
-        "b_q2_attention", "b_q2_dist_com_oppose", "b_q2_dist_rath_oppose", "b_q2_dist_neither", "b_q2_dist_rath_support",
-        "b_q2_dist_com_support",
-        # "b_ad_unemp_guess", "b_ad_unemp_certainty", "b_ad_patent_guess", "b_ad_patent_certainty", "b_ad_consum_meat",
-        # "b_ad_consum_transport", "b_ad_consum_energy", "b_ad_consum_footprint", "b_ad_consum_flights",
-        # "b_ad_consum_recycling", "b_ad_job_prospects", "b_ad_net_hh_income", "b_ad_tax_burd_number",
-        # "b_ad_tax_burd_certainty", "b_ad_tax_burd_none", "b_ad_tax_burd_none_other",
-        "unemployment_rate", "unemployment_rate", "soc_inequ_climate", "politics_climate",
-        "bioecon_prod_cleaning", "bioecon_prod_cosmetics", "bioecon_prod_furniture", "bioecon_prod_dishes",
-        "bioecon_prod_bags", "bioecon_prod_dispos_dish", "bioecon_prod_packaging", "bioecon_prod_wood",
-        "bioecon_prod_trashbags", "bioecon_prod_clothes", "bioecon_prod_building", "bioecon_prod_none",
-        "bioecon_prod_other", "bioecon_prod_all",
-        "moral_state_compassion", "moral_state_laws_fair", "moral_state_proud", "moral_state_child_respect",
-         "moral_state_disgusting", "moral_state_good_than_bad", "moral_state_hurt_animals", "moral_state_justice",
-         "moral_state_loyal_family", "moral_state_diff_roles", "moral_state_unnatural", "moral_state_never_kill",
-         "moral_state_inherit", "moral_state_team_player", "moral_state_obey", "moral_state_chastity",
-        "moral_rel_importance_values", "moral_rel_suffering", "moral_rel_treat_diff", "moral_rel_love_country", "moral_rel_lack_respect",
-        "moral_rel_violate_purity", "moral_rel_math", "moral_rel_care", "moral_rel_unfair", "moral_rel_betray",
-        "moral_rel_traditions", "moral_rel_disgusting", "moral_rel_cruelty", "moral_rel_deny_rights",
-        "moral_rel_lack_loyalty", "moral_rel_disorder", "moral_rel_god_approve",
-        "moral_universal_values", "moral_communal_values", "moral_care_score", "moral_fairness_score",
-        "moral_in_group_score", "moral_authority_score", "moral_purity_score",
-        "politics_orientation", "politics_vote", "politics_climate", "soc_inequ_climate", "covid_coping",
-        "covid_finance",
-        "unemployment_rate", "unemployment_count", "patent",
-        "patience", "risk", "posrecip", "negrecip", "altruism", "trust"
+    PERSONAL = [
+        "age", "gender", "income_section", "education", "children", "religious", "migration_b_germany", "eastger",
+        "unemployment", "income_group", "job", "subject_well_being", "politics_orientation", "politics_vote",
+        "politics_climate", "soc_inequ_climate", "covid_coping", "covid_finance"
     ]
-    climate_eurobarometer = [
-        "climate_know", "climate_eb_problem", "climate_eb_resp_all", "climate_eb_resp_nat_gov", "climate_eb_resp_eu",
-        "climate_eb_resp_reg_gov", "climate_eb_resp_industry", "climate_eb_resp_self", "climate_eb_resp_activists",
-        "climate_eb_resp_other", "climate_eb_resp_nobody", "climate_eb_resp_dont_know", "climate_eb_renewable",
-        "climate_eb_efficient", "climate_eb_ets", "climate_eb_state_expertise", "climate_eb_state_energy_security",
-        "climate_eb_state_innovation", "climate_eb_state_transition", "climate_eb_state_pos_outcome",
-        "climate_eb_state_min_emissions"]
-    climate_knowledge = [
-        "climate_flood_affect", "climate_risk", "climate_belief_score", "climate_institutions_score",
-        "climate_state_worry", "climate_state_damage", "climate_state_adhere_goal", "climate_state_together",
-        "climate_state_EU", "climate_state_Germany", "climate_state_region", "climate_state_single_person",
-        "climate_state_manmade", "climate_state_forecasts", "climate_state_disagree", "climate_state_convinced",
-        "climate_state_media", "climate_state_children", "climate_state_extreme_weather"]
-    climate_policies_actions = [
+    ECONOMIC_PREFERENCES = ["patience", "risk", "posrecip", "negrecip", "altruism", "trust"]
+    CLIMATE_EUROBAROMETER = [
+        "climate_know", "climate_eb_renewable", "climate_eb_efficient", "climate_eb_ets", "climate_eb_state_expertise",
+        "climate_eb_state_energy_security", "climate_eb_state_innovation", "climate_eb_state_transition",
+        "climate_eb_state_pos_outcome", "climate_eb_state_min_emissions"
+    ]
+    CLIMATE_KNOWLEDGE = [
+        "climate_flood_affect", "climate_risk", "climate_institutions_score", "climate_state_worry",
+        "climate_state_damage", "climate_state_adhere_goal", "climate_state_together", "climate_state_EU",
+        "climate_state_Germany", "climate_state_region", "climate_state_single_person", "climate_state_forecasts",
+        "climate_state_disagree", "climate_state_convinced", "climate_state_media", "climate_state_children",
+        "climate_state_extreme_weather"
+    ]
+    CLIMATE_POLICIES_ACTIONS = [
         "climate_policies_score", "climate_actions_score", "climate_policies_fund_research",
         "climate_policies_stop_coal", "climate_policies_carbon_tax", "climate_policies_tax_rabates",
         "climate_actions_public_display", "climate_actions_donate", "climate_actions_volunteer",
         "climate_actions_discuss", "climate_actions_protest", "climate_actions_contact_news",
-        "climate_actions_social_media"]
-    climate_trust = [
+        "climate_actions_social_media"
+    ]
+    CLIMATE_TRUST = [
         "climate_trust_all_score", "climate_trust_internat_score", "climate_trust_nat_score", "climate_trust_city",
         "climate_trust_state_gov", "climate_trust_nat_gov", "climate_trust_companies", "climate_trust_scientist",
-        "climate_trust_un", "climate_trust_eu"]
+        "climate_trust_un", "climate_trust_eu"
+    ]
+    BIOECONOMY = [
+        "bioecon_prod_clothes", "bioecon_prod_cleaning", "bioecon_prod_cosmetics", "bioecon_prod_furniture",
+        "bioecon_prod_dishes", "bioecon_prod_bags", "bioecon_prod_dispos_dish", "bioecon_prod_packaging",
+        "bioecon_prod_wood", "bioecon_prod_building", "bioecon_prod_trashbags", "bioecon_prod_none",
+        "bioecon_prod_other"
+    ]
+    MORAL_VALUES = [
+        "moral_rel_importance_values", "moral_universal_values", "moral_communal_values", "moral_care_score",
+        "moral_fairness_score", "moral_in_group_score", "moral_authority_score", "moral_purity_score",
+        "moral_rel_suffering", "moral_rel_treat_diff", "moral_rel_love_country", "moral_rel_lack_respect",
+        "moral_rel_violate_purity", "moral_rel_math", "moral_rel_care", "moral_rel_unfair", "moral_rel_betray",
+        "moral_rel_traditions", "moral_rel_disgusting", "moral_rel_cruelty", "moral_rel_deny_rights",
+        "moral_rel_lack_loyalty", "moral_rel_disorder", "moral_rel_god_approve", "moral_state_compassion",
+        "moral_state_laws_fair", "moral_state_proud", "moral_state_child_respect", "moral_state_disgusting",
+        "moral_state_good_than_bad", "moral_state_hurt_animals", "moral_state_justice", "moral_state_loyal_family",
+        "moral_state_diff_roles", "moral_state_unnatural", "moral_state_never_kill", "moral_state_inherit",
+        "moral_state_team_player", "moral_state_obey", "moral_state_chastity"
+    ]
 
-    cols_dict = {"climate_eurobarometer": 0,
-                 "climate_knowledge": 1,
-                 "climate_policies_actions": 2,
-                 "climate_trust": 3}
-    list_of_cols = [climate_eurobarometer, climate_knowledge, climate_policies_actions, climate_trust]
-    if experiment != "full":
-        if experiment == "wo_personal":
-            to_be_dropped_cols.extend(personal)
-        else:
-            if experiment != "wo_climate":
-                list_of_cols.pop(cols_dict[experiment])
-            for experiment_cols in list_of_cols:
-                to_be_dropped_cols.extend(experiment_cols)
+    experiments_dict = {
+        "PERSONAL_DATA": PERSONAL, "ECONOMIC_PREFERENCES": ECONOMIC_PREFERENCES,
+        "CLIMATE_EUROBAROMETER": CLIMATE_EUROBAROMETER, "CLIMATE_KNOWLEDGE": CLIMATE_KNOWLEDGE,
+        "CLIMATE_POLICIES_ACTIONS": CLIMATE_POLICIES_ACTIONS, "CLIMATE_TRUST": CLIMATE_TRUST,
+        "BIOECONOMY": BIOECONOMY, "MORAL_VALUES": MORAL_VALUES
+    }
 
-    if experiment != "climate_belief_score":
-        full_data = full_data.drop(columns=to_be_dropped_cols, axis=1)
-        if not climate_belief_score :
-            full_data = full_data.drop(columns=["climate_belief_score"], axis=1)
-    else:
-        full_data = full_data[["climate_belief_score", "climatedeniers"]]
+    for featureset in featuresets:
+        usecols.extend(experiments_dict[featureset])
 
-    full_data = encode_data(full_data, save_dir, experiment)
+    full_data = pd.read_csv("datasets/Climate_Deniers.csv", usecols=usecols)
+    train_val, test = sklearn.model_selection.train_test_split(full_data, test_size=0.2, random_state=42,
+                                                               stratify=full_data[dependent_variable])
+    full_data = impute_data(train_val, test)
+
+    full_data = encode_data(full_data, save_dir, featuresets, dependent_variable)
 
     full_data.to_csv("datasets/dataset_preprocessed.csv", index=False)
 
@@ -397,4 +293,4 @@ def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None):
     test_num_imp.columns = test[num_columns].columns
     test_num_imp.index = test.index
 
-    return pd.concat([train_num_imp, train_str_imp], axis=1), pd.concat([test_num_imp, test_str_imp], axis=1)
+    return pd.concat([pd.concat([train_num_imp, train_str_imp], axis=1), pd.concat([test_num_imp, test_str_imp], axis=1)])

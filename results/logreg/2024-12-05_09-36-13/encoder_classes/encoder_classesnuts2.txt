@@ -1,7 +1,0 @@
-['Arnsberg' 'Berlin' 'Brandenburg' 'Braunschweig' 'Bremen' 'Chemnitz'
- 'Darmstadt' 'Detmold' 'Dresden' 'Düsseldorf' 'Freiburg' 'Gießen'
- 'Hamburg' 'Hannover' 'Karlsruhe' 'Kassel' 'Koblenz' 'Köln' 'Leipzig'
- 'Lüneburg' 'Mecklenburg-Vorpommern' 'Mittelfranken' 'Münster'
- 'Niederbayern' 'Oberbayern' 'Oberfranken' 'Oberpfalz' 'Rheinhessen-Pfalz'
- 'Saarland' 'Sachsen-Anhalt' 'Schleswig-Holstein' 'Schwaben' 'Stuttgart'
- 'Thüringen' 'Trier' 'Tübingen' 'Unterfranken' 'Weser-Ems']

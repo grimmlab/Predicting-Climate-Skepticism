@@ -1,8 +1,0 @@
-sampling,under
-sampling_strategy,not majority
-impute,False
-alpha,1.9609223240190143
-fit_intercept,False
-copy_X,False
-tol,0.0001702909842491135
-solver,svd

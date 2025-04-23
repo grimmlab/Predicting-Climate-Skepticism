@@ -1,2 +1,0 @@
-['angemessener Preis pro Tonne CO<sub>2</sub>'
- 'angemessenes Reduktionsziel']

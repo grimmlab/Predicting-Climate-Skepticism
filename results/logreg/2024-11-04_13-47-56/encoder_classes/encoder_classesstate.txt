@@ -1,4 +1,0 @@
-['Baden-Württemberg' 'Bavaria' 'Berlin' 'Brandenburg' 'Bremen' 'Hamburg'
- 'Hesse' 'Lower Saxony' 'Mecklenburg-Western Pommerania'
- 'North Rhine-Westphalia' 'Rhineland-Palatinate' 'Saarland' 'Saxony'
- 'Saxony-Anhalt' 'Schleswig-Holstein' 'Thuringia']
