@@ -4,7 +4,7 @@ import pathlib
 import datetime
 
 def run(model_name: str = None):
-    DEPENDENT_VARIABLES = ["climate_eb_problem", "climate_belief_score"] # "climatedeniers",
+    DEPENDENT_VARIABLES = ["climatedeniers", "climate_eb_problem", "climate_belief_score"]
     EXPERIMENTS = [
         "PERSONAL_DATA", "ECONOMIC_PREFERENCES", "CLIMATE_EUROBAROMETER", "CLIMATE_KNOWLEDGE",
         "CLIMATE_POLICIES_ACTIONS", "CLIMATE_TRUST", "BIOECONOMY", "MORAL_VALUES"]
