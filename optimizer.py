@@ -34,7 +34,7 @@ class Optimizer:
         else:
             model_name_task = f"{self.model_name}_regressor"
 
-        unfitted_model: base_model_.BaseModel = utils.get_mapping_name_to_class()[model_name_task](optuna_trial=trial)
+        unfitted_model: base_model_.BaseModel = utils.get_mapping_name_to_class()[model_name_task](optuna_trial=trial, dependent_variable=self.dependent_variable)
 
         self.save_dir.joinpath('temp').mkdir(parents=True, exist_ok=True)
         unfitted_model.save_model(path=self.save_dir.joinpath('temp'), filename=f'unfitted_model_trial {trial.number}')

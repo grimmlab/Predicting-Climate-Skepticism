@@ -8,12 +8,13 @@ import pathlib
 class BaseModel(abc.ABC):
 
     # Constructor super class #
-    def __init__(self, optuna_trial: optuna.trial.Trial):
+    def __init__(self, optuna_trial: optuna.trial.Trial, dependent_variable: str):
 
         self.all_hyperparams = self.common_hyperparams()
         self.all_hyperparams.update(self.define_hyperparams_to_tune())
         self.optuna_trial = optuna_trial
         self.model = self.define_model()
+        self.dependent_variable = dependent_variable
 
     # Methods required by each child class #
     @abc.abstractmethod
@@ -29,12 +30,12 @@ class BaseModel(abc.ABC):
         """
 
     def retrain(self, retrain: pd.DataFrame):
-        x_train = retrain.drop("climatedeniers", axis=1)
-        y_train = retrain["climatedeniers"]
+        x_train = retrain.drop(self.dependent_variable, axis=1)
+        y_train = retrain[self.dependent_variable]
         self.model.fit(x_train, y_train)
 
     def predict(self, X_in: pd.DataFrame) -> np.array:
-        X_in = X_in.drop("climatedeniers", axis=1)
+        X_in = X_in.drop(self.dependent_variable, axis=1)
         prediction = self.model.predict(X_in)
         return prediction
 

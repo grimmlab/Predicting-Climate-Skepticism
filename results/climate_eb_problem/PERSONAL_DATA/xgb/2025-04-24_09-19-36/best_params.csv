@@ -1,0 +1,8 @@
+standardize_X,False
+max_depth,732
+n_estimators,1200
+learning_rate,0.05
+subsample,0.2
+colsample_bytree,0.06
+max_leaves,867
+objective,reg:pseudohubererror

@@ -16,7 +16,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
         data["climatedeniers"] = data["climatedeniers"].replace(["moderate", "climate_denier"], [0, 1])
     if dependent_variable == "climate_eb_problem":
         data["climate_eb_problem"] = (
-            data["climate_eb_problem"].replace(["No serious problem at all", "A very serious problem"], [1, 10]))
+            data["climate_eb_problem"].replace(["No serious problem at all", "A very serious problem"], [1, 10])).astype(float)
 
     if "PERSONAL_DATA" in featuresets:
 
@@ -43,7 +43,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
         ## Replacement of certain values
         data["subject_well_being"] = (
             data["subject_well_being"].replace(["Completely satisfied", "Not satisfied at all"], [1, 10]).astype(float))
-        data["children"] = data["children"].replace(["none", "5 or more"], [0, 6]).astype(float)
+        data["children"] = data["children"].replace(["None", "5 or more"], [0, 6]).astype(float)
 
         ## Label encoding
         label_cols_personal = ["migration_b_germany", "religious", "eastger", "unemployment"]

@@ -7,8 +7,8 @@ import optuna
 
 class XGBoostClassifier(base_model_.BaseModel, abc.ABC):
 
-    def __init__(self, optuna_trial: optuna.trial.Trial):
-        super().__init__(optuna_trial=optuna_trial)
+    def __init__(self, optuna_trial: optuna.trial.Trial, dependent_variable: str):
+        super().__init__(optuna_trial=optuna_trial, dependent_variable=dependent_variable)
 
     def define_model(self) -> xgboost.XGBModel:
 
