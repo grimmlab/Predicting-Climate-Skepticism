@@ -78,16 +78,18 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
                  'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
             data[col] = encoder.fit_transform(data[[col]])
 
-    if "CLIMATE_KNOWLEDGE" in featuresets:
+    if ("CLIMATE_KNOWLEDGE" in featuresets) and (dependent_variable != "climate_belief_score"):
 
         ## Ordinal encoding
         encoder = OrdinalEncoder(categories=[["Very low", "Rather low", "Rather high", "Very high"]])
         data["climate_risk"] = (encoder.fit_transform(data[["climate_risk"]]))
-        ordinal_cols_climate_state = \
-            ["climate_state_worry", "climate_state_damage", "climate_state_adhere_goal","climate_state_together",
-             "climate_state_single_person", "climate_state_forecasts", "climate_state_disagree",
-             "climate_state_convinced", "climate_state_media", "climate_state_children",
-             "climate_state_extreme_weather", ]
+        ordinal_cols_climate_state = [
+            "climate_state_worry", "climate_state_damage", "climate_state_adhere_goal", "climate_state_together",
+            "climate_state_single_person", "climate_state_forecasts", "climate_state_disagree",
+            "climate_state_convinced", "climate_state_media", "climate_state_children",
+            "climate_state_extreme_weather"]
+        if dependent_variable != "climatedeniers":
+            ordinal_cols_climate_state.extend(["climate_state_manmade"])
         for col in ordinal_cols_climate_state:
             encoder = OrdinalEncoder(categories=[
                 ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',

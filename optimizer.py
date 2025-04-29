@@ -129,7 +129,7 @@ class Optimizer:
             self.data, test_size=0.2, random_state=42, stratify=self.data[self.dependent_variable])
 
         study = utils.create_new_study()
-        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=50)
+        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=2)
         print(f"Best matthews correlation score: {study.best_trial.value}")
         print(f"Best hyperparameters: {study.best_params}")
 
