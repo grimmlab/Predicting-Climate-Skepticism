@@ -57,7 +57,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
         ## one hot encoding
         data = pd.get_dummies(data, columns=["politics_vote"], dtype=int)
         data = pd.get_dummies(data, columns=["job"], dtype=int)
-        data = pd.get_dummies(data, columns=["gender"], dtype=int)
+        data = pd.get_dummies(data, columns=["female"], dtype=int)
 
     if "CLIMATE_EUROBAROMETER" in featuresets:
 
@@ -201,7 +201,7 @@ def preprocess_data(
     usecols = [dependent_variable]
 
     PERSONAL = [
-        "age", "gender", "income_section", "education", "children", "religious", "migration_b_germany", "eastger",
+        "age", "female", "income_section", "education", "children", "religious", "migration_b_germany", "eastger",
         "unemployment", "income_group", "job", "subject_well_being", "politics_orientation", "politics_vote",
         "politics_climate", "soc_inequ_climate", "covid_coping", "covid_finance"
     ]
@@ -263,7 +263,7 @@ def preprocess_data(
     for featureset in featuresets:
         usecols.extend(experiments_dict[featureset])
 
-    full_data = pd.read_csv("datasets/Climate_Deniers.csv", usecols=usecols)
+    full_data = pd.read_csv("datasets/ClimateDeniers.csv", usecols=usecols)
     train_val, test = sklearn.model_selection.train_test_split(full_data, test_size=0.2, random_state=42,
                                                                stratify=full_data[dependent_variable])
     full_data = impute_data(train_val, test)
