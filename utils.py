@@ -212,12 +212,16 @@ def preprocess_data(
         "climate_eb_state_pos_outcome", "climate_eb_state_min_emissions"
     ]
     CLIMATE_KNOWLEDGE = [
-        "climate_flood_affect", "climate_risk", "climate_institutions_score", "climate_state_worry",
-        "climate_state_damage", "climate_state_adhere_goal", "climate_state_together", "climate_state_EU",
-        "climate_state_Germany", "climate_state_region", "climate_state_single_person", "climate_state_forecasts",
-        "climate_state_disagree", "climate_state_convinced", "climate_state_media", "climate_state_children",
-        "climate_state_extreme_weather"
+        "climate_flood_affect", "climate_risk", "climate_institutions_score"
     ]
+    if dependent_variable != "climate_belief_score":
+        CLIMATE_KNOWLEDGE.extend([
+            "climate_state_worry", "climate_state_damage", "climate_state_adhere_goal", "climate_state_together",
+            "climate_state_EU", "climate_state_Germany", "climate_state_region", "climate_state_single_person",
+            "climate_state_forecasts", "climate_state_disagree", "climate_state_convinced", "climate_state_media",
+            "climate_state_children", "climate_state_extreme_weather"])
+        if dependent_variable != "climatedeniers":
+            CLIMATE_KNOWLEDGE.extend(["climate_state_manmade"])
     CLIMATE_POLICIES_ACTIONS = [
         "climate_policies_score", "climate_actions_score", "climate_policies_fund_research",
         "climate_policies_stop_coal", "climate_policies_carbon_tax", "climate_policies_tax_rabates",

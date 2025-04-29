@@ -129,7 +129,7 @@ class Optimizer:
             self.data, test_size=0.2, random_state=42, stratify=self.data[self.dependent_variable])
 
         study = utils.create_new_study()
-        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=2)
+        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=50)
         print(f"Best matthews correlation score: {study.best_trial.value}")
         print(f"Best hyperparameters: {study.best_params}")
 
@@ -149,7 +149,7 @@ class Optimizer:
         predictions = final_model.predict(test)
 
         np.savetxt(self.save_dir.joinpath('predictions.csv'), predictions, delimiter=",")
-        np.savetxt(self.save_dir.joinpath('test.csv'), test, delimiter=",", fmt='%s')
+        test.to_csv(self.save_dir.joinpath('test.csv'))
         with open(self.save_dir.joinpath('best_params.csv'), 'w+') as f:
             w = csv.writer(f)
             w.writerows(study.best_params.items())
@@ -160,10 +160,10 @@ class Optimizer:
                 self.save_dir.joinpath(f"final_model_feature_importances_{self.model_name}_{self.experiment}.csv"),
                 sep=",", decimal=".", float_format="%.10f", index=False)
 
-        self.shap(final_model, test)
+        # self.shap(final_model, test)
 
         with open(self.save_dir.joinpath('score_' + self.experiment + '.txt'), 'w') as f:
             if self.dependent_variable == "climatedeniers":
                 f.write(str(sklearn.metrics.matthews_corrcoef(y_true=test[self.dependent_variable], y_pred=predictions)))
-            if self.dependent_variable == "climatedeniers":
+            else:
                 f.write(str(sklearn.metrics.r2_score(y_true=test[self.dependent_variable], y_pred=predictions)))
