@@ -160,7 +160,7 @@ class Optimizer:
                 self.save_dir.joinpath(f"final_model_feature_importances_{self.model_name}_{self.experiment}.csv"),
                 sep=",", decimal=".", float_format="%.10f", index=False)
 
-        # self.shap(final_model, test)
+        self.shap(final_model, test)
 
         with open(self.save_dir.joinpath('score_' + self.experiment + '.txt'), 'w') as f:
             if self.dependent_variable == "climatedeniers":
