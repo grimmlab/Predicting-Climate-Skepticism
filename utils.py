@@ -46,7 +46,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
         data["children"] = data["children"].replace(["None", "5 or more"], [0, 6]).astype(float)
 
         ## Label encoding
-        label_cols_personal = ["migration_b_germany", "religious", "eastger", "unemployment"]
+        label_cols_personal = ["migration_b_germany", "religious", "unemployment"]
         for col in label_cols_personal:
             encoder = LabelEncoder()
             data[col] = (encoder.fit_transform(data[[col]]))
@@ -57,7 +57,8 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
         ## one hot encoding
         data = pd.get_dummies(data, columns=["politics_vote"], dtype=int)
         data = pd.get_dummies(data, columns=["job"], dtype=int)
-        data = pd.get_dummies(data, columns=["female"], dtype=int)
+        data = pd.get_dummies(data, columns=["gender"], dtype=int, drop_first=True)
+        data = pd.get_dummies(data, columns=["area"], dtype=int, drop_first=True)
 
     if "CLIMATE_EUROBAROMETER" in featuresets:
 
@@ -204,7 +205,7 @@ def preprocess_data(
     usecols = [dependent_variable]
 
     PERSONAL = [
-        "age", "female", "income_section", "education", "children", "religious", "migration_b_germany", "eastger",
+        "age", "gender", "income_section", "education", "children", "religious", "migration_b_germany", "area",
         "unemployment", "income_group", "job", "subject_well_being", "politics_orientation", "politics_vote",
         "politics_climate", "soc_inequ_climate", "covid_coping", "covid_finance"
     ]
