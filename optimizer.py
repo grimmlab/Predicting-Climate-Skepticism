@@ -7,7 +7,6 @@ import csv
 import shap
 import copy
 import matplotlib.pyplot as plt
-import imblearn
 import utils
 from models import base_model_
 import warnings
@@ -29,10 +28,7 @@ class Optimizer:
 
     def objective(self, trial: optuna.trial.Trial, train_val):
 
-        if self.dependent_variable == "climatedeniers":
-            model_name_task = f"{self.model_name}_classifier"
-        else:
-            model_name_task = f"{self.model_name}_regressor"
+        model_name_task = f"{self.model_name}_regressor"
 
         unfitted_model: base_model_.BaseModel = utils.get_mapping_name_to_class()[model_name_task](optuna_trial=trial, dependent_variable=self.dependent_variable)
 
@@ -54,19 +50,6 @@ class Optimizer:
                 train_val.iloc[val_indexes[fold]],
             )
 
-            if self.model_name == "climatedeniers" and model.sampling != None:
-                if model.sampling == "over":
-                    sampler = imblearn.over_sampling.RandomOverSampler(
-                        sampling_strategy=model.sampling_strategy, random_state=42)
-                else:
-                    sampler = imblearn.under_sampling.RandomUnderSampler(
-                        sampling_strategy=model.sampling_strategy, random_state=42)
-                train_X_sampled, train_y_sampled = sampler.fit_resample(
-                    train.drop(self.dependent_variable, axis=1), train[self.dependent_variable]
-                )
-                train = pd.concat([train_X_sampled, train_y_sampled], axis=1)
-                train = train.sample(frac=1).reset_index(drop=True)
-
             try:
                 y_pred = model.train_val_loop(train=train, val=val)
             except ValueError as exc:
@@ -78,10 +61,7 @@ class Optimizer:
                     trial_number=trial.number, trial_params=trial.params, reason=f'model creation: {exc}')
                 raise optuna.exceptions.TrialPruned()
 
-            if self.dependent_variable == "climate_deniers":
-                objective_value = sklearn.metrics.matthews_corrcoef(val[self.dependent_variable], y_pred)
-            else:
-                objective_value = sklearn.metrics.r2_score(val[self.dependent_variable], y_pred)
+            objective_value = sklearn.metrics.r2_score(val[self.dependent_variable], y_pred)
             objective_values.append(objective_value)
 
         current_val_result = float(np.mean(objective_values))
@@ -129,7 +109,7 @@ class Optimizer:
             self.data, test_size=0.2, random_state=42, stratify=self.data[self.dependent_variable])
 
         study = utils.create_new_study()
-        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=2)
+        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=30)
         print(f"Best matthews correlation score: {study.best_trial.value}")
         print(f"Best hyperparameters: {study.best_params}")
 
@@ -160,10 +140,7 @@ class Optimizer:
                 self.save_dir.joinpath(f"final_model_feature_importances_{self.model_name}_{self.experiment}.csv"),
                 sep=",", decimal=".", float_format="%.10f", index=False)
 
-        # self.shap(final_model, test)
+        self.shap(final_model, test)
 
         with open(self.save_dir.joinpath('score_' + self.experiment + '.txt'), 'w') as f:
-            if self.dependent_variable == "climatedeniers":
-                f.write(str(sklearn.metrics.matthews_corrcoef(y_true=test[self.dependent_variable], y_pred=predictions)))
-            else:
-                f.write(str(sklearn.metrics.r2_score(y_true=test[self.dependent_variable], y_pred=predictions)))
+            f.write(str(sklearn.metrics.r2_score(y_true=test[self.dependent_variable], y_pred=predictions)))
