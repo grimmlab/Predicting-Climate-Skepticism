@@ -263,8 +263,8 @@ def preprocess_data(
     usecols = [dependent_variable]
 
     PERSONAL = [
-        "gender", "age","income_group","income_section","state","nuts2","district","plz","education","marital_status","children",
-        "job","job_field_maingroup","job_field_group","religion","religion_practice","religion_christian",
+        "gender", "age","income_group","income_section","state","nuts2","district","plz","education","marital_status",
+        "children","job","job_field_maingroup","job_field_group","religion","religion_practice","religion_christian",
         "religion_islam","migration_b_germany","migration_b_g_city","migration_b_g_state","migration_b_g_nuts2",
         "migration_b_g_district","migration_b_country","migration_s_germany","migration_s_g_city","migration_s_g_state",
         "migration_s_g_nuts2","migration_s_g_district","migration_s_country","migration_region","subject_well_being",
@@ -283,10 +283,9 @@ def preprocess_data(
     if dependent_variable != "climate_eb_problem":
         CLIMATE_EUROBAROMETER.extend(["climate_eb_problem"])
     CLIMATE_KNOWLEDGE = [
-        "climate_flood_affect","climate_risk","climate_belief_score","climate_institutions_score",
-        "climate_state_worry","climate_state_damage","climate_state_adhere_goal","climate_state_together",
-        "climate_state_EU","climate_state_Germany","climate_state_region","climate_state_single_person",
-        "climate_state_forecasts","climate_state_disagree","climate_state_media",
+        "climate_flood_affect","climate_risk","climate_state_worry","climate_state_damage","climate_state_adhere_goal",
+        "climate_state_together","climate_state_EU","climate_state_Germany","climate_state_region",
+        "climate_state_single_person","climate_state_forecasts","climate_state_disagree","climate_state_media",
         "climate_state_children","climate_state_extreme_weather"
     ]
     if dependent_variable != "climate_state_manmade":
@@ -294,13 +293,13 @@ def preprocess_data(
     if dependent_variable != "climate_state_convinced":
         CLIMATE_KNOWLEDGE.extend(["climate_state_convinced"])
     CLIMATE_POLICIES_ACTIONS = [
-        "climate_policies_score","climate_actions_score","climate_policies_fund_research","climate_policies_stop_coal",
-        "climate_policies_carbon_tax","climate_policies_tax_rabates","climate_actions_public_display",
-        "climate_actions_donate","climate_actions_volunteer","climate_actions_discuss","climate_actions_protest",
+        "climate_policies_fund_research","climate_policies_stop_coal","climate_policies_carbon_tax",
+        "climate_policies_tax_rabates","climate_actions_public_display","climate_actions_donate",
+        "climate_actions_volunteer","climate_actions_discuss","climate_actions_protest",
         "climate_actions_contact_news","climate_actions_social_media"
     ]
     CLIMATE_TRUST = [
-        "climate_trust_all_score","climate_trust_internat_score","climate_trust_nat_score","climate_trust_city",
+       "climate_trust_city",
         "climate_trust_state_gov","climate_trust_nat_gov","climate_trust_companies","climate_trust_scientist",
         "climate_trust_un","climate_trust_eu"
     ]
@@ -310,8 +309,6 @@ def preprocess_data(
         "bioecon_prod_wood","bioecon_prod_building","bioecon_prod_trashbags","bioecon_prod_none","bioecon_prod_other"
     ]
     MORAL_VALUES = [
-        "moral_rel_importance_values","moral_universal_values","moral_communal_values","moral_care_score",
-        "moral_fairness_score","moral_in_group_score","moral_authority_score","moral_purity_score",
         "moral_rel_suffering","moral_rel_treat_diff","moral_rel_love_country","moral_rel_lack_respect",
         "moral_rel_violate_purity","moral_rel_math","moral_rel_care","moral_rel_unfair","moral_rel_betray",
         "moral_rel_traditions","moral_rel_disgusting","moral_rel_cruelty","moral_rel_deny_rights",
@@ -337,14 +334,16 @@ def preprocess_data(
         usecols.extend(experiments_dict[featureset])
 
     full_data = pd.read_csv("datasets/ClimateDeniers.csv", usecols=usecols)
-    full_data[["migration_b_country", "religion_christian", "religion_islam", "migration_s_country"]] = full_data[[
-        "migration_b_country", "religion_christian", "religion_islam", "migration_s_country"]].fillna("Not applicable")
-    full_data[["children"]] = full_data[["children"]].fillna(0)
-    full_data[["job_field_maingroup", "religion", "religion_practice"]] = full_data[[
-        "job_field_maingroup", "religion", "religion_practice"]].fillna("Not applicable")
+    if "PERSONAL_DATA" in featuresets:
+        full_data[["migration_b_country", "religion_christian", "religion_islam", "migration_s_country"]] = full_data[[
+            "migration_b_country", "religion_christian", "religion_islam", "migration_s_country"]].fillna("Not applicable")
+        full_data[["children"]] = full_data[["children"]].fillna(0)
+        full_data[["job_field_maingroup", "religion", "religion_practice"]] = full_data[[
+            "job_field_maingroup", "religion", "religion_practice"]].fillna("Not applicable")
     train_val, test = sklearn.model_selection.train_test_split(full_data, test_size=0.2, random_state=42,
                                                                stratify=full_data[dependent_variable])
-    full_data = impute_data(train_val, test)
+    if full_data.isnull().values.any():
+        full_data = impute_data(train_val, test)
 
     full_data = encode_data(full_data, save_dir, featuresets, dependent_variable)
 

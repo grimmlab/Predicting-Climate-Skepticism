@@ -81,9 +81,9 @@ class Optimizer:
 
         return feat_import_df
 
-    def shap(self, final_model, test):
-        explainer = shap.Explainer(final_model.predict, test)
-        shap_values = explainer(test, max_evals=1000)
+    def shap(self, final_model, train_val, test):
+        explainer = shap.Explainer(final_model.predict, train_val)
+        shap_values = explainer(test)
 
         joblib.dump(explainer, self.save_dir.joinpath('explainer.sav'))
 
@@ -140,7 +140,7 @@ class Optimizer:
                 self.save_dir.joinpath(f"final_model_feature_importances_{self.model_name}_{self.experiment}.csv"),
                 sep=",", decimal=".", float_format="%.10f", index=False)
 
-        self.shap(final_model, test)
+        self.shap(final_model, train_val, test)
 
         with open(self.save_dir.joinpath('score_' + self.experiment + '.txt'), 'w') as f:
             f.write(str(sklearn.metrics.r2_score(y_true=test[self.dependent_variable], y_pred=predictions)))
