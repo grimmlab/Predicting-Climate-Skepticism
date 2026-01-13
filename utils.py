@@ -17,13 +17,11 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
             data["climate_eb_problem"].replace(["No serious problem at all", "A very serious problem"], [1, 10])).astype(float)
     if dependent_variable == "climate_state_manmade":
         encoder = OrdinalEncoder(categories=[
-            ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
-             'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
+            ['Completely disagree', 'Rather disagree', 'Rather agree', 'Completely agree']])
         data["climate_state_manmade"] = encoder.fit_transform(data[["climate_state_manmade"]])
     if dependent_variable == "climate_state_convinced":
         encoder = OrdinalEncoder(categories=[
-            ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
-             'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
+            ['Completely disagree', 'Rather disagree', 'Moderately disagree', 'Rather agree', 'Completely agree']])
         data["climate_state_convinced"] = encoder.fit_transform(data[["climate_state_convinced"]])
 
     if "PERSONAL_DATA" in featuresets:
@@ -38,16 +36,16 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
              '2750 - 3000 EUR', '3000 - 4000 EUR', '4000 - 5000 EUR', '5000 - 7500 EUR', '>=7500 EUR']])
         data["income_section"] = encoder.fit_transform(data[["income_section"]])
         encoder = OrdinalEncoder(categories=[
-            ["Keine Angabe", "Other", "No degree", "Hauptschule", "Realschule", "Abitur", "Lehre", "Hochschule",
+            ["Other", "No degree", "Hauptschule", "Realschule", "Abitur", "Lehre", "Hochschule",
              "Doktor, Habilitation"]], handle_unknown="use_encoded_value", unknown_value=np.nan)
         data["education"] = encoder.fit_transform(data[["education"]])
         encoder = OrdinalEncoder(categories=[[
-            "Not applicable", "Never", "Less frequently", "Several times a year", "One too three times a month",
-            "Once a week", "More than once a week"]])
+            "Never", "Less frequently", "Several times a year", "One too three times a month", "Once a week",
+            "More than once a week"]])
         data["religion_practice"] = encoder.fit_transform(data[["religion_practice"]])
         encoder = OrdinalEncoder(categories=[
-            ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
-             'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
+            ['No information provided', 'Completely disagree', 'Rather disagree', 'Moderately disagree', 'Neither agree nor disagree',
+             'Slightly agree', 'Rather agree', 'Completely agree']])
         data["innovation"] = encoder.fit_transform(data[["innovation"]])
 
         ## Replacement of certain values
@@ -56,10 +54,9 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
         data["children"] = data["children"].replace(["None", "5 or more"], [0, 6]).astype(float)
         data['migration_region'] = (data['migration_region'].replace(
             ['Neud', 'Weiß', 'KEIN', 'weiß', 'Gieß', '40Ja', 'Y200', 'Deut', 'nein', 'Acht', 'Gar ', '197q', 'kein',
-             'fünf',
-             'xxxx', '75 J', '10 j', "Germ", "oooo", '000/', "19i8", "Draw", '1ß65', "Oooo", '2oo6'],
-            [0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
-             0000, 0000, 0000, 0000, 1965, 0000, 2006])).astype(int)
+             'fünf', 'xxxx', '75 J', '10 j', "Germ", "oooo", '000/', "19i8", "Draw", '1ß65', "Oooo", '2oo6'],
+            [0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 1970, 0000, 0000, 0000, 0000, 0000, 0000,
+             0000, 0000, 1998, 0000, 1965, 0000, 2006])).astype(int)
 
         ## Label encoding
         label_cols_personal = [
@@ -94,8 +91,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
              "climate_eb_state_transition", "climate_eb_state_pos_outcome", "climate_eb_state_min_emissions"]
         for col in ordinal_cols_eb:
             encoder = OrdinalEncoder(categories=[
-                ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
-                 'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
+                ['Completely disagree', 'Rather disagree', 'Rather agree', 'Completely agree']])
             data[col] = encoder.fit_transform(data[[col]])
 
         ## one hot encoding
@@ -127,8 +123,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
             ordinal_cols_climate_state.extend(["climate_state_convinced"])
         for col in ordinal_cols_climate_state:
             encoder = OrdinalEncoder(categories=[
-                ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
-                 'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
+                ['Completely disagree', 'Rather disagree', 'Rather agree', 'Completely agree']])
             data[col] = encoder.fit_transform(data[[col]])
 
     if "CLIMATE_POLICIES_ACTIONS" in featuresets:
@@ -139,8 +134,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
              "climate_policies_tax_rabates"]
         for col in ordinal_cols_policies:
             encoder = OrdinalEncoder(categories=[
-                ['Keine Angabe', 'Completely disagree', 'Rather disagree', 'Moderately disagree',
-                 'Neither agree nor disagree', 'Slightly agree', 'Rather agree', 'Completely agree']])
+                ['Completely disagree', 'Rather disagree', 'Rather agree', 'Completely agree']])
             data[col] = encoder.fit_transform(data[[col]])
         ordinal_cols_climate_actions = \
             ["climate_actions_public_display", "climate_actions_donate", "climate_actions_volunteer",
@@ -187,8 +181,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
         for col in ordinal_cols_moral_state:
             encoder = OrdinalEncoder(categories=[
                 ['Completely disagree', 'Slightly disagree', 'Moderately disagree', 'Slightly agree',
-                 'Moderately agree',
-                 'Completely agree']])
+                 'Moderately agree', 'Completely agree']])
             data[col] = encoder.fit_transform(data[[col]])
 
     if "ADDITIONAL_VARIABLES" in featuresets:
@@ -335,15 +328,13 @@ def preprocess_data(
 
     full_data = pd.read_csv("datasets/ClimateDeniers.csv", usecols=usecols)
     if "PERSONAL_DATA" in featuresets:
-        full_data[["migration_b_country", "religion_christian", "religion_islam", "migration_s_country"]] = full_data[[
-            "migration_b_country", "religion_christian", "religion_islam", "migration_s_country"]].fillna("Not applicable")
-        full_data[["children"]] = full_data[["children"]].fillna(0)
-        full_data[["job_field_maingroup", "religion", "religion_practice"]] = full_data[[
-            "job_field_maingroup", "religion", "religion_practice"]].fillna("Not applicable")
+        full_data[["religion_practice"]] = full_data[["religion_practice"]].fillna("Never")
+        full_data[["innovation"]] = full_data[["innovation"]].fillna("No information provided")
+        full_data[["migration_region"]] = full_data[["migration_region"]].fillna(0000)
     train_val, test = sklearn.model_selection.train_test_split(full_data, test_size=0.2, random_state=42,
                                                                stratify=full_data[dependent_variable])
-    if full_data.isnull().values.any():
-        full_data = impute_data(train_val, test)
+    # if full_data.isnull().values.any():
+    #     full_data = impute_data(train_val, test)
 
     full_data = encode_data(full_data, save_dir, featuresets, dependent_variable)
 
