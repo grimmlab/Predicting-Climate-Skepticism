@@ -29,10 +29,10 @@ class Optimizer:
 
     def objective(self, trial: optuna.trial.Trial, train_val):
 
-        # if self.dependent_variable == "climate_eb_problem":
-        model_name_task = f"{self.model_name}_regressor"
-        # else:
-        #     model_name_task = f"{self.model_name}_classifier"
+        if self.dependent_variable == "climate_eb_problem":
+            model_name_task = f"{self.model_name}_regressor"
+        else:
+            model_name_task = f"{self.model_name}_classifier"
 
         unfitted_model: base_model_.BaseModel = utils.get_mapping_name_to_class()[model_name_task](optuna_trial=trial, dependent_variable=self.dependent_variable)
 
@@ -54,18 +54,18 @@ class Optimizer:
                 train_val.iloc[val_indexes[fold]],
             )
 
-            # if self.dependent_variable != "climate_eb_problem" and model.sampling != None:
-            #     if model.sampling == "over":
-            #         sampler = imblearn.over_sampling.RandomOverSampler(
-            #             sampling_strategy=model.sampling_strategy, random_state=42)
-            #     else:
-            #         sampler = imblearn.under_sampling.RandomUnderSampler(
-            #             sampling_strategy=model.sampling_strategy, random_state=42)
-            #     train_X_sampled, train_y_sampled = sampler.fit_resample(
-            #         train.drop(self.dependent_variable, axis=1), train[self.dependent_variable]
-            #     )
-            #     train = pd.concat([train_X_sampled, train_y_sampled], axis=1)
-            #     train = train.sample(frac=1).reset_index(drop=True)
+            if self.dependent_variable != "climate_eb_problem" and model.sampling != None:
+                if model.sampling == "over":
+                    sampler = imblearn.over_sampling.RandomOverSampler(
+                        sampling_strategy=model.sampling_strategy, random_state=42)
+                else:
+                    sampler = imblearn.under_sampling.RandomUnderSampler(
+                        sampling_strategy=model.sampling_strategy, random_state=42)
+                train_X_sampled, train_y_sampled = sampler.fit_resample(
+                    train.drop(self.dependent_variable, axis=1), train[self.dependent_variable]
+                )
+                train = pd.concat([train_X_sampled, train_y_sampled], axis=1)
+                train = train.sample(frac=1).reset_index(drop=True)
 
             try:
                 y_pred = model.train_val_loop(train=train, val=val)
@@ -78,10 +78,10 @@ class Optimizer:
                     trial_number=trial.number, trial_params=trial.params, reason=f'model creation: {exc}')
                 raise optuna.exceptions.TrialPruned()
 
-            # if self.dependent_variable != "climate_eb_problem":
-            #     objective_value = sklearn.metrics.matthews_corrcoef(val[self.dependent_variable], y_pred)
-            # else:
-            objective_value = sklearn.metrics.r2_score(val[self.dependent_variable], y_pred)
+            if self.dependent_variable != "climate_eb_problem":
+                objective_value = sklearn.metrics.matthews_corrcoef(val[self.dependent_variable], y_pred)
+            else:
+                objective_value = sklearn.metrics.r2_score(val[self.dependent_variable], y_pred)
 
             objective_values.append(objective_value)
 
@@ -106,24 +106,24 @@ class Optimizer:
         explainer = shap.Explainer(final_model.predict, train_val)
         shap_values = explainer(test)
 
-        # joblib.dump(explainer, self.save_dir.joinpath('explainer.sav'))
-        #
-        # joblib.dump(shap_values, self.save_dir.joinpath('shapvalues.sav'))
-        #
-        # for feature in self.data.drop(self.dependent_variable, axis=1).columns:
-        #     shap.partial_dependence_plot(
-        #         feature,
-        #         final_model.predict,
-        #         test,
-        #         ice=False,
-        #         model_expected_value=True,
-        #         feature_expected_value=True,
-        #         show=False
-        #     )
-        #     f = plt.gcf()
-        #     self.save_dir.joinpath('partial_dependence_plots').mkdir(parents=True, exist_ok=True)
-        #     f.savefig(self.save_dir.joinpath(f"partial_dependence_plots/shap.partial_dependence_plot_{feature}.pdf"),
-        #               format='pdf', bbox_inches='tight')
+        joblib.dump(explainer, self.save_dir.joinpath('explainer.sav'))
+
+        joblib.dump(shap_values, self.save_dir.joinpath('shapvalues.sav'))
+
+        for feature in self.data.drop(self.dependent_variable, axis=1).columns:
+            shap.partial_dependence_plot(
+                feature,
+                final_model.predict,
+                test,
+                ice=False,
+                model_expected_value=True,
+                feature_expected_value=True,
+                show=False
+            )
+            f = plt.gcf()
+            self.save_dir.joinpath('partial_dependence_plots').mkdir(parents=True, exist_ok=True)
+            f.savefig(self.save_dir.joinpath(f"partial_dependence_plots/shap.partial_dependence_plot_{feature}.pdf"),
+                      format='pdf', bbox_inches='tight')
 
     def run_optimization(self):
         train_val, test = sklearn.model_selection.train_test_split(
@@ -164,7 +164,7 @@ class Optimizer:
         self.shap(final_model, train_val, test)
 
         with open(self.save_dir.joinpath('score_' + self.experiment + '.txt'), 'w') as f:
-            # if self.dependent_variable != "climate_eb_problem":
-            #     f.write(str(sklearn.metrics.matthews_corrcoef(y_true=test[self.dependent_variable], y_pred=predictions)))
-            # else:
-            f.write(str(sklearn.metrics.r2_score(y_true=test[self.dependent_variable], y_pred=predictions)))
+            if self.dependent_variable != "climate_eb_problem":
+                f.write(str(sklearn.metrics.matthews_corrcoef(y_true=test[self.dependent_variable], y_pred=predictions)))
+            else:
+                f.write(str(sklearn.metrics.r2_score(y_true=test[self.dependent_variable], y_pred=predictions)))

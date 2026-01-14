@@ -21,7 +21,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
         data["climate_state_manmade"] = encoder.fit_transform(data[["climate_state_manmade"]])
     if dependent_variable == "climate_state_convinced":
         encoder = OrdinalEncoder(categories=[
-            ['Completely disagree', 'Rather disagree', 'Moderately disagree', 'Rather agree', 'Completely agree']])
+            ['Completely disagree', 'Rather disagree', 'Rather agree', 'Completely agree']])
         data["climate_state_convinced"] = encoder.fit_transform(data[["climate_state_convinced"]])
 
     if "PERSONAL_DATA" in featuresets:
@@ -331,10 +331,6 @@ def preprocess_data(
         full_data[["religion_practice"]] = full_data[["religion_practice"]].fillna("Never")
         full_data[["innovation"]] = full_data[["innovation"]].fillna("No information provided")
         full_data[["migration_region"]] = full_data[["migration_region"]].fillna(0000)
-    train_val, test = sklearn.model_selection.train_test_split(full_data, test_size=0.2, random_state=42,
-                                                               stratify=full_data[dependent_variable])
-    # if full_data.isnull().values.any():
-    #     full_data = impute_data(train_val, test)
 
     full_data = encode_data(full_data, save_dir, featuresets, dependent_variable)
 
