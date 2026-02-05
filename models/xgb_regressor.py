@@ -18,6 +18,8 @@ class XGBoostRegressor(base_model_.BaseModel, abc.ABC):
 
         max_depth = self.suggest_hyperparam_to_optuna('max_depth')
         n_estimators = self.suggest_hyperparam_to_optuna('n_estimators')
+        reg_lambda = self.suggest_hyperparam_to_optuna('reg_lambda')
+        reg_alpha = self.suggest_hyperparam_to_optuna('reg_alpha')
         learning_rate = self.suggest_hyperparam_to_optuna('learning_rate')
         subsample = self.suggest_hyperparam_to_optuna('subsample')
         colsample_bytree = self.suggest_hyperparam_to_optuna('colsample_bytree')
@@ -26,7 +28,8 @@ class XGBoostRegressor(base_model_.BaseModel, abc.ABC):
         return xgboost.XGBRegressor(
             random_state=42, verbosity=1, tree_method="auto", max_depth=max_depth, n_estimators=n_estimators, gamma=gamma,
             learning_rate=learning_rate, subsample=subsample, colsample_bytree=colsample_bytree,
-            objective="reg:squarederror", device="cuda" if torch.cuda.is_available() else "cpu")
+            objective="reg:squarederror", device="cuda" if torch.cuda.is_available() else "cpu", reg_alpha=reg_alpha,
+            reg_lambda=reg_lambda)
 
     def define_hyperparams_to_tune(self) -> dict:
         """
@@ -44,17 +47,29 @@ class XGBoostRegressor(base_model_.BaseModel, abc.ABC):
                 'upper_bound': 2000,
                 'step': 50
             },
+            'gamma': {
+                'datatype': 'float',
+                'lower_bound': 0.001,
+                'upper_bound': 1.0,
+                'log': True
+            },
+            'reg_lambda': {
+                'datatype': 'float',
+                'lower_bound': 0.1,
+                'upper_bound': 100,
+                'log': True
+            },
+            'reg_alpha': {
+                'datatype': 'float',
+                'lower_bound': 0.1,
+                'upper_bound': 100,
+                'log': True
+            },
             'learning_rate': {
                 'datatype': 'float',
                 'lower_bound': 0.025,
                 'upper_bound': 0.3,
                 'step': 0.025
-            },
-            'gamma': {
-                'datatype': 'int',
-                'lower_bound': 0,
-                'upper_bound': 1000,
-                'step': 10
             },
             'subsample': {
                 'datatype': 'float',

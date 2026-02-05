@@ -23,17 +23,19 @@ class XGBoostClassifier(base_model_.BaseModel, abc.ABC):
             self.x_scaler = sklearn.preprocessing.StandardScaler()
 
         max_depth = self.suggest_hyperparam_to_optuna('max_depth')
+        gamma = self.suggest_hyperparam_to_optuna('gamma')
+        reg_lambda = self.suggest_hyperparam_to_optuna('reg_lambda')
+        reg_alpha = self.suggest_hyperparam_to_optuna('reg_alpha')
         n_estimators = self.suggest_hyperparam_to_optuna('n_estimators')
         learning_rate = self.suggest_hyperparam_to_optuna('learning_rate')
         subsample = self.suggest_hyperparam_to_optuna('subsample')
         colsample_bytree = self.suggest_hyperparam_to_optuna('colsample_bytree')
-        max_leaves = self.suggest_hyperparam_to_optuna('max_leaves')
-        objective = self.suggest_hyperparam_to_optuna('objective')
 
         return xgboost.XGBClassifier(
             random_state=42, verbosity=1, tree_method="hist", max_depth=max_depth, n_estimators=n_estimators,
-            learning_rate=learning_rate, subsample=subsample, colsample_bytree=colsample_bytree, max_leaves=max_leaves,
-            objective=objective, enable_categorical=True, device="cuda" if torch.cuda.is_available() else "cpu")
+            learning_rate=learning_rate, subsample=subsample, colsample_bytree=colsample_bytree, reg_alpha=reg_alpha,
+            enable_categorical=True, device="cuda" if torch.cuda.is_available() else "cpu", gamma=gamma,
+            reg_lambda=reg_lambda)
 
     def define_hyperparams_to_tune(self) -> dict:
         """
@@ -50,6 +52,24 @@ class XGBoostClassifier(base_model_.BaseModel, abc.ABC):
                 'lower_bound': 50,
                 'upper_bound': 2000,
                 'step': 50
+            },
+            'gamma': {
+                'datatype': 'float',
+                'lower_bound': 0.001,
+                'upper_bound': 1.0,
+                'log': True
+            },
+            'reg_lambda': {
+                'datatype': 'float',
+                'lower_bound': 0.1,
+                'upper_bound': 100,
+                'log': True
+            },
+            'reg_alpha': {
+                'datatype': 'float',
+                'lower_bound': 0.1,
+                'upper_bound': 100,
+                'log': True
             },
             'learning_rate': {
                 'datatype': 'float',
@@ -68,15 +88,6 @@ class XGBoostClassifier(base_model_.BaseModel, abc.ABC):
                 'lower_bound': 0.005,
                 'upper_bound': 1.0,
                 'step': 0.005
-            },
-            'max_leaves': {
-                'datatype': 'int',
-                'lower_bound': 0,
-                'upper_bound': 1000
-            },
-            'objective': {
-                'datatype': 'categorical',
-                'list_of_values': ["binary:logistic", "binary:logitraw"]
             }
         }
 
