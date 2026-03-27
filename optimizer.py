@@ -68,8 +68,7 @@ class Optimizer:
                 print(exc)
                 print(trial.params)
                 print('Trial failed. Error in model creation.')
-                self.clean_up_after_exception(
-                    trial_number=trial.number, trial_params=trial.params, reason=f'model creation: {exc}')
+                self.clean_up_after_exception(trial_number=trial.number)
                 raise optuna.exceptions.TrialPruned()
 
             if self.dependent_variable != "climate_eb_problem":
@@ -83,17 +82,13 @@ class Optimizer:
 
         return current_val_result
 
-    def clean_up_after_exception(self, trial_number: int, trial_params: dict, reason: str):
+    def clean_up_after_exception(self, trial_number: int):
         if self.save_dir.joinpath('temp', f'unfitted_model_trial{trial_number}').exists():
             self.save_dir.joinpath('temp', f'unfitted_model_trial {trial_number}').unlink()
 
     def shap(self, final_model, train_val, test):
         explainer = shap.Explainer(final_model.predict, train_val)
-        shap_values = explainer(test)
 
-        joblib.dump(explainer, self.save_dir.joinpath('explainer.sav'))
-
-        joblib.dump(shap_values, self.save_dir.joinpath('shapvalues.sav'))
         """
         for feature in self.data.drop(self.dependent_variable, axis=1).columns:
             shap.partial_dependence_plot(
@@ -110,6 +105,7 @@ class Optimizer:
             f.savefig(self.save_dir.joinpath(f"partial_dependence_plots/shap.partial_dependence_plot_{feature}.pdf"),
                       format='pdf', bbox_inches='tight')
         """
+        return explainer(test)
 
     def run_optimization(self):
         train_val, test = sklearn.model_selection.train_test_split(
@@ -140,7 +136,7 @@ class Optimizer:
             w = csv.writer(f)
             w.writerows(study.best_params.items())
 
-        self.shap(final_model, train_val, test)
+        shap_values = self.shap(final_model, train_val, test)
 
         with open(self.save_dir.joinpath('score.txt'), 'w') as f:
             if self.dependent_variable != "climate_eb_problem":
@@ -148,4 +144,6 @@ class Optimizer:
             else:
                 f.write(str(sklearn.metrics.r2_score(y_true=test[self.dependent_variable], y_pred=predictions)))
 
-        return predictions
+        np.savetxt(self.save_dir.joinpath('shap_values.csv'), shap_values.values, delimiter=",")
+
+        return predictions, shap_values

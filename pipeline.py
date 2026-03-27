@@ -25,6 +25,7 @@ def run():
             featuresets = EXPERIMENTS[:EXPERIMENTS.index(experiment) + 1]
 
             predictions = []
+            shap_values = []
 
             for modus in ["normal", "hypothesis"]:
                 print(f'{bcolors.HEADER}{dependent_variable, featuresets, modus}{bcolors.ENDC}')
@@ -35,14 +36,23 @@ def run():
                 data = utils.preprocess_data(save_dir=save_dir, dependent_variable=dependent_variable, featuresets=featuresets, modus=modus)
 
                 optimizer_run = optimizer.Optimizer(experiment=experiment, data=data, save_dir=save_dir, dependent_variable=dependent_variable)
-                predictions.append(optimizer_run.run_optimization())
+                predictions.append(optimizer_run.run_optimization()[0])
+                shap_values.append(optimizer_run.run_optimization()[1])
 
-            with open(save_dir.parent.joinpath('ttest.txt'), 'w') as f:
-                f.write(str(stats.ttest_ind(predictions[1], predictions[0])))
+            ttest_predictions = stats.ttest_ind(predictions[1], predictions[0])
+            print(f"T-Test Predictions: {ttest_predictions}")
+            with open(save_dir.parent.joinpath('ttest_predictions.txt'), 'w') as f:
+                f.write(str(ttest_predictions))
+
+            ttest_shap_values = stats.ttest_ind(shap_values[1].values, shap_values[0].values)
+            print(ttest_shap_values)
+            with open(save_dir.parent.joinpath('ttest_shap_values.txt'), 'w') as f:
+                f.write(str(ttest_shap_values))
 
             if len(featuresets) > 1:
 
                 predictions = []
+                shap_values = []
 
                 for modus in ["normal", "hypothesis"]:
 
@@ -56,11 +66,18 @@ def run():
                     data = utils.preprocess_data(save_dir=save_dir, dependent_variable=dependent_variable, featuresets=featuresets, modus=modus)
 
                     optimizer_run = optimizer.Optimizer(experiment=experiment, data=data, save_dir=save_dir, dependent_variable=dependent_variable)
-                    predictions.append(optimizer_run.run_optimization())
+                    predictions.append(optimizer_run.run_optimization()[0])
+                    shap_values.append(optimizer_run.run_optimization()[1])
 
-                print(stats.ttest_ind(predictions[1], predictions[0]))
-                with open(save_dir.joinpath('ttest.txt'), 'w') as f:
-                    f.write(str(stats.ttest_ind(predictions[1], predictions[0])))
+                ttest_predictions = stats.ttest_ind(predictions[1], predictions[0])
+                print(f"T-Test Predictions: {ttest_predictions}")
+                with open(save_dir.parent.joinpath('ttest_predictions.txt'), 'w') as f:
+                    f.write(str(ttest_predictions))
+
+                ttest_shap_values = stats.ttest_ind(shap_values[1].values, shap_values[0].values)
+                print(ttest_shap_values)
+                with open(save_dir.parent.joinpath('ttest_shap_values.txt'), 'w') as f:
+                    f.write(str(ttest_shap_values))
 
 if __name__ == "__main__":
 

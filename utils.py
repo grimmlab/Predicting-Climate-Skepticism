@@ -337,7 +337,9 @@ def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = Non
     if modus == "hypothesis":
         full_data[dependent_variable] = np.random.permutation(full_data[dependent_variable].values)
 
-    full_data.to_csv(f"datasets/preprocessed/{modus}_{dependent_variable}_{''.join(featuresets)}.csv", index=False)
+    dataset_dir = pathlib.Path("datasets/preprocessed")
+    dataset_dir.mkdir(parents=True, exist_ok=True)
+    full_data.to_csv(dataset_dir.joinpath(f"{modus}_{dependent_variable}_{''.join(featuresets)}.csv"), index=False)
 
     return full_data
 
