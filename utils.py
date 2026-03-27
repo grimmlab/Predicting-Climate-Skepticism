@@ -1,5 +1,6 @@
 import pathlib
 import numpy as np
+np.random.seed(0)
 from sklearn.preprocessing import OrdinalEncoder, LabelEncoder
 import sklearn
 import datetime
@@ -212,10 +213,10 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
     return data
 
 
-def get_indexes(df: pd.DataFrame, n_splits: int=10, target_column: str=None):
+def get_indexes(df: pd.DataFrame, n_splits: int=5, target_column: str=None):
     train_indexes = []
     test_indexes = []
-    splitter = sklearn.model_selection.StratifiedShuffleSplit(n_splits=n_splits, random_state=42)
+    splitter = sklearn.model_selection.StratifiedKFold(n_splits=n_splits, random_state=42, shuffle=True)
     X = df.drop(columns=[target_column])
     y = df[target_column]
     for train_index, test_index in splitter.split(X, y):
@@ -250,8 +251,7 @@ def get_mapping_name_to_class() -> dict:
     return modules_mapped
 
 
-def preprocess_data(
-        save_dir: pathlib.Path = None, dependent_variable: str = None, featuresets: list = None) -> pd.DataFrame:
+def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = None, featuresets: list = None, modus: str = None) -> pd.DataFrame:
 
     usecols = [dependent_variable]
 
@@ -334,7 +334,10 @@ def preprocess_data(
 
     full_data = encode_data(full_data, save_dir, featuresets, dependent_variable)
 
-    full_data.to_csv("datasets/dataset_preprocessed.csv", index=False)
+    if modus == "hypothesis":
+        full_data[dependent_variable] = np.random.permutation(full_data[dependent_variable].values)
+
+    full_data.to_csv(f"datasets/preprocessed/{modus}_{dependent_variable}_{''.join(featuresets)}.csv", index=False)
 
     return full_data
 

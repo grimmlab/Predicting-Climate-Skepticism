@@ -16,37 +16,31 @@ import joblib
 import traceback
 import imblearn
 
+optuna.logging.set_verbosity(optuna.logging.WARNING)
+
 class Optimizer:
 
-    def __init__(
-            self, experiment: str = None, data: pd.DataFrame = None, model_name: str = None,
-            save_dir: pathlib.Path = None, dependent_variable: str = None):
+    def __init__(self, experiment: str = None, data: pd.DataFrame = None, save_dir: pathlib.Path = None, dependent_variable: str = None):
         self.experiment = experiment
         self.data = data
-        self.model_name = model_name
         self.save_dir = save_dir
         self.dependent_variable = dependent_variable
+        self.folds = 5
 
     def objective(self, trial: optuna.trial.Trial, train_val):
 
-        if self.dependent_variable == "climate_eb_problem":
-            model_name_task = f"{self.model_name}_regressor"
-        else:
-            model_name_task = f"{self.model_name}_classifier"
+        model_name_task = "xgb_regressor" if self.dependent_variable == "climate_eb_problem" else "xgb_classifier"
 
         unfitted_model: base_model_.BaseModel = utils.get_mapping_name_to_class()[model_name_task](optuna_trial=trial, dependent_variable=self.dependent_variable)
 
         self.save_dir.joinpath('temp').mkdir(parents=True, exist_ok=True)
         unfitted_model.save_model(path=self.save_dir.joinpath('temp'), filename=f'unfitted_model_trial {trial.number}')
 
-        print(f"Params for Trial {trial.number}")
-        print(trial.params)
-
         objective_values = []
 
-        train_indexes, val_indexes = utils.get_indexes(df=train_val, target_column=self.dependent_variable)
+        train_indexes, val_indexes = utils.get_indexes(df=train_val, target_column=self.dependent_variable, n_splits=self.folds)
 
-        for fold in range(5):
+        for fold in range(self.folds):
             model = copy.deepcopy(unfitted_model)
 
             train, val = (
@@ -93,15 +87,6 @@ class Optimizer:
         if self.save_dir.joinpath('temp', f'unfitted_model_trial{trial_number}').exists():
             self.save_dir.joinpath('temp', f'unfitted_model_trial {trial_number}').unlink()
 
-    def get_feature_importance(self, model) -> pd.DataFrame:
-        feat_import_df = pd.DataFrame()
-        feature_importances = model.feature_importances_
-        sorted_idx = feature_importances.argsort()[::-1]
-        feat_import_df["feature"] = self.data.drop([self.dependent_variable], axis=1).columns[sorted_idx]
-        feat_import_df["feature_importance"] = feature_importances[sorted_idx]
-
-        return feat_import_df
-
     def shap(self, final_model, train_val, test):
         explainer = shap.Explainer(final_model.predict, train_val)
         shap_values = explainer(test)
@@ -109,7 +94,7 @@ class Optimizer:
         joblib.dump(explainer, self.save_dir.joinpath('explainer.sav'))
 
         joblib.dump(shap_values, self.save_dir.joinpath('shapvalues.sav'))
-
+        """
         for feature in self.data.drop(self.dependent_variable, axis=1).columns:
             shap.partial_dependence_plot(
                 feature,
@@ -124,15 +109,15 @@ class Optimizer:
             self.save_dir.joinpath('partial_dependence_plots').mkdir(parents=True, exist_ok=True)
             f.savefig(self.save_dir.joinpath(f"partial_dependence_plots/shap.partial_dependence_plot_{feature}.pdf"),
                       format='pdf', bbox_inches='tight')
+        """
 
     def run_optimization(self):
         train_val, test = sklearn.model_selection.train_test_split(
             self.data, test_size=0.2, random_state=42, stratify=self.data[self.dependent_variable])
 
         study = utils.create_new_study()
-        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=30)
+        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=30, show_progress_bar=True)
         print(f"Best score: {study.best_trial.value}")
-        print(f"Best hyperparameters: {study.best_params}")
 
         # Move validation results and models of best trial
         files_to_keep_path = self.save_dir.joinpath('temp', f'*trial {study.best_trial.number}*')
@@ -145,7 +130,7 @@ class Optimizer:
 
         final_model.retrain(train_val)
 
-        joblib.dump(final_model, self.save_dir.joinpath(f'best_model_{self.model_name}'))
+        joblib.dump(final_model, self.save_dir.joinpath(f'best_model'))
 
         predictions = final_model.predict(test)
 
@@ -155,16 +140,12 @@ class Optimizer:
             w = csv.writer(f)
             w.writerows(study.best_params.items())
 
-        if hasattr(final_model, "feature_importances_"):
-            feat_import_df = self.get_feature_importance(model=final_model.model)
-            feat_import_df.to_csv(
-                self.save_dir.joinpath(f"final_model_feature_importances_{self.model_name}_{self.experiment}.csv"),
-                sep=",", decimal=".", float_format="%.10f", index=False)
-
         self.shap(final_model, train_val, test)
 
-        with open(self.save_dir.joinpath('score_' + self.experiment + '.txt'), 'w') as f:
+        with open(self.save_dir.joinpath('score.txt'), 'w') as f:
             if self.dependent_variable != "climate_eb_problem":
                 f.write(str(sklearn.metrics.matthews_corrcoef(y_true=test[self.dependent_variable], y_pred=predictions)))
             else:
                 f.write(str(sklearn.metrics.r2_score(y_true=test[self.dependent_variable], y_pred=predictions)))
+
+        return predictions

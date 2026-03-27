@@ -221,3 +221,7 @@ __marimo__/
 /__pycache__
 /plots
 /results
+/models/__pycache__
+/datasets/preprocessed
+Plots.ipynb
+/models/__pycache__
