@@ -10,5 +10,5 @@ This pipeline is developed and maintained by members of the [Bioinformatics lab]
 
 Citation
 ---------------------
-Forecasting seasonally fluctuating sales of perishable products in the horticultural industry. J Eiglsperger, M Speckner, A Pondorfer, SJ Goerg,  DG Grimm.
+Machine Learning Predicts Climate Skepticism and Identifies Individual Driving Factors with Explainable Artificial Intelligence. J Eiglsperger, M Speckner, A Pondorfer, SJ Goerg,  DG Grimm.
 Currently under review, 2026.
