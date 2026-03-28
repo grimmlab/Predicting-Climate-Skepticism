@@ -48,7 +48,7 @@ class Optimizer:
                 train_val.iloc[val_indexes[fold]],
             )
 
-            if self.dependent_variable != "climate_eb_problem" and model.sampling != None:
+            if hasattr(model, 'sampling') and hasattr(model, 'sampling_strategy'):
                 if model.sampling == "over":
                     sampler = imblearn.over_sampling.RandomOverSampler(
                         sampling_strategy=model.sampling_strategy, random_state=42)

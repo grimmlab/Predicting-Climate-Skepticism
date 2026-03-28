@@ -104,13 +104,5 @@ class BaseModel(abc.ABC):
             'standardize_X': {
                 'datatype': 'categorical',
                 'list_of_values': [True, False],
-            },
-            'sampling': {
-                'datatype': 'categorical',
-                'list_of_values': [None, "over", "under"]
-            },
-            'sampling_strategy': {
-                'datatype': 'categorical',
-                'list_of_values': ["auto", "all", "minmajority", "not majority", "not minority"]
             }
         }

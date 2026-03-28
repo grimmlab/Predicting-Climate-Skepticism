@@ -13,7 +13,9 @@ class XGBoostClassifier(base_model_.BaseModel, abc.ABC):
     def define_model(self) -> xgboost.XGBModel:
 
         self.sampling = self.suggest_hyperparam_to_optuna('sampling')
-        self.sampling_strategy = self.suggest_hyperparam_to_optuna('sampling_strategy')
+        sampeling_stragety = self.suggest_hyperparam_to_optuna('sampling_strategy')
+        if sampeling_stragety != None:
+            self.sampling_strategy = self.suggest_hyperparam_to_optuna('sampling_strategy')
         if self.sampling == "over" and self.sampling_strategy == "minmajority":
             self.sampling_strategy = "minority"
         if self.sampling == "under" and self.sampling_strategy == "minmajority":
@@ -88,6 +90,14 @@ class XGBoostClassifier(base_model_.BaseModel, abc.ABC):
                 'lower_bound': 0.005,
                 'upper_bound': 1.0,
                 'step': 0.005
+            },
+            'sampling': {
+                'datatype': 'categorical',
+                'list_of_values': [None, "over", "under"]
+            },
+            'sampling_strategy': {
+                'datatype': 'categorical',
+                'list_of_values': ["all", "minmajority", "not majority", "not minority"]
             }
         }
 
