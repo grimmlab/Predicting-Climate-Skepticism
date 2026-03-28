@@ -1,4 +1,4 @@
-<div align="left"><img src="https://github.com/user-attachments/assets/401dc777-6f44-4ed0-9796-8f38489fb4f2" height="160"/></div>
+<div align="left"><img src="https://github.com/user-attachments/assets/7b305774-61aa-434e-8bf7-001a065703ec" height="160"/></div>
 
 Machine Learning Predicts Climate Skepticism and Identifies Individual Driving Factors with Explainable Artificial Intelligence
 ===============================================================================================================================
