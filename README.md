@@ -12,6 +12,6 @@ This repository is developed and maintained by members of the [Bioinformatics la
 
 Citation
 ---------------------
-**Machine Learning Predicts Climate Skepticism and Identifies Individual Driving Factors with Explainable Artificial Intelligence.** <br />
+**Machine Learning Predicts Climate Skepticism and Identifies Individual Driving Features with Explainable Artificial Intelligence.** <br />
 J Eiglsperger, M Speckner, A Pondorfer, SJ Goerg,  DG Grimm. <br />
 *Currently under review, 2026.* <br />
