@@ -12,10 +12,6 @@ class XGBoostRegressor(base_model_.BaseModel, abc.ABC):
 
     def define_model(self) -> xgboost.XGBModel:
 
-        self.standardize_X = self.suggest_hyperparam_to_optuna('standardize_X')
-        if self.standardize_X:
-            self.x_scaler = sklearn.preprocessing.StandardScaler()
-
         max_depth = self.suggest_hyperparam_to_optuna('max_depth')
         n_estimators = self.suggest_hyperparam_to_optuna('n_estimators')
         reg_lambda = self.suggest_hyperparam_to_optuna('reg_lambda')

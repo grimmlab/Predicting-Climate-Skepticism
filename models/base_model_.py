@@ -10,8 +10,7 @@ class BaseModel(abc.ABC):
     # Constructor super class #
     def __init__(self, optuna_trial: optuna.trial.Trial, dependent_variable: str):
 
-        self.all_hyperparams = self.common_hyperparams()
-        self.all_hyperparams.update(self.define_hyperparams_to_tune())
+        self.all_hyperparams = self.define_hyperparams_to_tune()
         self.optuna_trial = optuna_trial
         self.model = self.define_model()
         self.dependent_variable = dependent_variable
@@ -96,13 +95,3 @@ class BaseModel(abc.ABC):
 
     def save_model(self, path: pathlib.Path, filename: str):
         joblib.dump(self, path.joinpath(filename), compress=3)
-
-    @staticmethod
-    def common_hyperparams():
-
-        return {
-            'standardize_X': {
-                'datatype': 'categorical',
-                'list_of_values': [True, False],
-            }
-        }

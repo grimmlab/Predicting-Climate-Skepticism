@@ -19,9 +19,6 @@ class XGBoostClassifier(base_model_.BaseModel, abc.ABC):
                 self.sampling_strategy = "minority"
             if self.sampling == "under" and self.sampling_strategy == "minmajority":
                 self.sampling_strategy = "majority"
-        self.standardize_X = self.suggest_hyperparam_to_optuna('standardize_X')
-        if self.standardize_X:
-            self.x_scaler = sklearn.preprocessing.StandardScaler()
 
         max_depth = self.suggest_hyperparam_to_optuna('max_depth')
         gamma = self.suggest_hyperparam_to_optuna('gamma')
