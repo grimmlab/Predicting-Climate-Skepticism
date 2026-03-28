@@ -13,13 +13,12 @@ class XGBoostClassifier(base_model_.BaseModel, abc.ABC):
     def define_model(self) -> xgboost.XGBModel:
 
         self.sampling = self.suggest_hyperparam_to_optuna('sampling')
-        sampeling_stragety = self.suggest_hyperparam_to_optuna('sampling_strategy')
-        if sampeling_stragety != None:
+        if self.sampling != None:
             self.sampling_strategy = self.suggest_hyperparam_to_optuna('sampling_strategy')
-        if self.sampling == "over" and self.sampling_strategy == "minmajority":
-            self.sampling_strategy = "minority"
-        if self.sampling == "under" and self.sampling_strategy == "minmajority":
-            self.sampling_strategy = "majority"
+            if self.sampling == "over" and self.sampling_strategy == "minmajority":
+                self.sampling_strategy = "minority"
+            if self.sampling == "under" and self.sampling_strategy == "minmajority":
+                self.sampling_strategy = "majority"
         self.standardize_X = self.suggest_hyperparam_to_optuna('standardize_X')
         if self.standardize_X:
             self.x_scaler = sklearn.preprocessing.StandardScaler()
