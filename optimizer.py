@@ -88,7 +88,11 @@ class Optimizer:
 
     def shap(self, final_model, train_val, test):
         explainer = shap.Explainer(final_model.predict, train_val)
+        shap_values = explainer(test)
 
+        joblib.dump(explainer, self.save_dir.joinpath('explainer.sav'))
+
+        joblib.dump(shap_values, self.save_dir.joinpath('shapvalues.sav'))
         """
         for feature in self.data.drop(self.dependent_variable, axis=1).columns:
             shap.partial_dependence_plot(

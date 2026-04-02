@@ -216,7 +216,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
 def get_indexes(df: pd.DataFrame, n_splits: int=5, target_column: str=None):
     train_indexes = []
     test_indexes = []
-    splitter = sklearn.model_selection.StratifiedKFold(n_splits=n_splits, random_state=42, shuffle=True)
+    splitter = sklearn.model_selection.StratifiedKFold(n_splits=n_splits, random_state=42, shuffle=True) if target_column != "climate_eb_problem" else sklearn.model_selection.KFold(n_splits=n_splits, random_state=42, shuffle=True)
     X = df.drop(columns=[target_column])
     y = df[target_column]
     for train_index, test_index in splitter.split(X, y):
