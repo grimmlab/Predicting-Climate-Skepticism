@@ -1,7 +1,6 @@
 import optimizer
 import utils
 import pathlib
-import datetime
 import scipy.stats as stats
 
 class bcolors:
@@ -16,8 +15,8 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 def run():
-    DEPENDENT_VARIABLES = ["climate_state_manmade", "climate_eb_problem", "climate_state_convinced"]
-    EXPERIMENTS = ["PERSONAL_DATA", "ADDITIONAL_VARIABLES", "MORAL_VALUES", "ECONOMIC_PREFERENCES", "CLIMATE_EUROBAROMETER",
+    DEPENDENT_VARIABLES = ["climate_eb_problem", "climate_state_manmade", "climate_state_convinced"]
+    EXPERIMENTS = ["PERSONAL_DATA", "MORAL_VALUES", "ECONOMIC_PREFERENCES", "CLIMATE_EUROBAROMETER",
         "CLIMATE_KNOWLEDGE", "CLIMATE_POLICIES_ACTIONS", "CLIMATE_TRUST", "BIOECONOMY"]
 
     for dependent_variable in DEPENDENT_VARIABLES:
@@ -58,7 +57,7 @@ def run():
 
                     print(f'{bcolors.HEADER}{dependent_variable, featuresets, modus}{bcolors.ENDC}')
 
-                    save_dir = pathlib.Path(f"results/{dependent_variable}/{experiment}/{modus}/{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}/")
+                    save_dir = pathlib.Path(f"results/{dependent_variable}/{experiment}/{modus}/")
                     save_dir.mkdir(parents=True, exist_ok=True)
 
                     featuresets = [experiment]

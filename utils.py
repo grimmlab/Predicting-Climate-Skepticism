@@ -48,6 +48,9 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
             ['No information provided', 'Completely disagree', 'Rather disagree', 'Moderately disagree', 'Neither agree nor disagree',
              'Slightly agree', 'Rather agree', 'Completely agree']])
         data["innovation"] = encoder.fit_transform(data[["innovation"]])
+        encoder = OrdinalEncoder(categories=[
+            ["Very unimportant", "Unimportant", "Neither unimportant nor important", "Important", "Very important"]])
+        data["politics_climate"] = encoder.fit_transform(data[["politics_climate"]])
 
         ## Replacement of certain values
         data["subject_well_being"] = (
@@ -58,6 +61,8 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
              'fünf', 'xxxx', '75 J', '10 j', "Germ", "oooo", '000/', "19i8", "Draw", '1ß65', "Oooo", '2oo6'],
             [0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 1970, 0000, 0000, 0000, 0000, 0000, 0000,
              0000, 0000, 1998, 0000, 1965, 0000, 2006])).astype(int)
+        data["politics_vote"] = data["politics_vote"].replace(["Bündnis 90/Die Grünen", "CDU/CSU"],
+                                                              ["Bündnis 90|Die Grünen", "CDU|CSU"])
 
         ## Label encoding
         label_cols_personal = [
@@ -65,7 +70,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
             "migration_b_g_city", "migration_b_g_state", "migration_b_g_nuts2", "migration_b_g_district",
             "migration_b_country", "migration_s_germany", "migration_s_g_city", "migration_s_g_state",
             "migration_s_g_nuts2", "migration_s_g_district", "migration_s_country", "job_field_maingroup",
-            "job_field_group"]
+            "job_field_group","unemployment_rate"]
         for col in label_cols_personal:
             encoder = LabelEncoder()
             data[col] = (encoder.fit_transform(data[[col]]))
@@ -74,8 +79,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
                 f.write(str(encoder.classes_))
 
         ## one hot encoding
-        data = pd.get_dummies(data, columns=["job", "marital_status"], dtype=int)
-        data = pd.get_dummies(data, columns=["gender"], dtype=int, drop_first=True)
+        data = pd.get_dummies(data, columns=["job", "marital_status", "politics_vote", "gender"], dtype=int)
 
     if "CLIMATE_EUROBAROMETER" in featuresets:
 
@@ -126,6 +130,10 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
             encoder = OrdinalEncoder(categories=[
                 ['Completely disagree', 'Rather disagree', 'Rather agree', 'Completely agree']])
             data[col] = encoder.fit_transform(data[[col]])
+
+        ## Ordinal encoding
+        encoder = OrdinalEncoder(categories=[["Strongly decrease", "Slightly decrease", "No change", "Slightly increase", "Strongly increase"]])
+        data["soc_inequ_climate"] = encoder.fit_transform(data[["soc_inequ_climate"]])
 
     if "CLIMATE_POLICIES_ACTIONS" in featuresets:
 
@@ -185,31 +193,6 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
                  'Moderately agree', 'Completely agree']])
             data[col] = encoder.fit_transform(data[[col]])
 
-    if "ADDITIONAL_VARIABLES" in featuresets:
-
-        ## Ordinal encoding
-        encoder = OrdinalEncoder(categories=[
-            ["Very unimportant", "Unimportant", "Neither unimportant nor important", "Important", "Very important"]])
-        data["politics_climate"] = encoder.fit_transform(data[["politics_climate"]])
-        encoder = OrdinalEncoder(categories=[
-            ["Strongly decrease", "Slightly decrease", "No change", "Slightly increase", "Strongly increase"]])
-        data["soc_inequ_climate"] = encoder.fit_transform(data[["soc_inequ_climate"]])
-
-        ## Replacement of certain values
-        data["politics_vote"] = data["politics_vote"].replace(["Bündnis 90/Die Grünen", "CDU/CSU"], ["Bündnis 90|Die Grünen", "CDU|CSU"])
-
-        ## Label encoding
-        label_cols_personal = ["unemployment_rate"]
-        for col in label_cols_personal:
-            encoder = LabelEncoder()
-            data[col] = (encoder.fit_transform(data[[col]]))
-            save_dir.joinpath('encoder_classes').mkdir(parents=True, exist_ok=True)
-            with open(save_dir.joinpath(f'encoder_classes/encoder_classes_{col}.txt'), 'w') as f:
-                f.write(str(encoder.classes_))
-
-        ## one hot encoding
-        data = pd.get_dummies(data, columns=["politics_vote"], dtype=int)
-
     return data
 
 
@@ -261,7 +244,8 @@ def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = Non
         "religion_islam","migration_b_germany","migration_b_g_city","migration_b_g_state","migration_b_g_nuts2",
         "migration_b_g_district","migration_b_country","migration_s_germany","migration_s_g_city","migration_s_g_state",
         "migration_s_g_nuts2","migration_s_g_district","migration_s_country","migration_region","subject_well_being",
-        "innovation"
+        "innovation", "politics_orientation","politics_vote","politics_climate","covid_coping","covid_finance",
+        "unemployment_rate","patent"
     ]
     ECONOMIC_PREFERENCES = [
         "patience", "risk", "posrecip", "negrecip", "altruism", "trust"
@@ -279,7 +263,7 @@ def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = Non
         "climate_flood_affect","climate_risk","climate_state_worry","climate_state_damage","climate_state_adhere_goal",
         "climate_state_together","climate_state_EU","climate_state_Germany","climate_state_region",
         "climate_state_single_person","climate_state_forecasts","climate_state_disagree","climate_state_media",
-        "climate_state_children","climate_state_extreme_weather"
+        "climate_state_children","climate_state_extreme_weather","soc_inequ_climate"
     ]
     if dependent_variable != "climate_state_manmade":
         CLIMATE_KNOWLEDGE.extend(["climate_state_manmade"])
@@ -311,16 +295,12 @@ def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = Non
         "moral_state_diff_roles","moral_state_unnatural","moral_state_never_kill","moral_state_inherit",
         "moral_state_team_player","moral_state_obey","moral_state_chastity"
     ]
-    ADDITIONAL_VARIABLES = [
-        "politics_orientation","politics_vote","politics_climate","soc_inequ_climate","covid_coping","covid_finance",
-        "unemployment_rate","patent"
-    ]
 
     experiments_dict = {
         "PERSONAL_DATA": PERSONAL, "ECONOMIC_PREFERENCES": ECONOMIC_PREFERENCES,
         "CLIMATE_EUROBAROMETER": CLIMATE_EUROBAROMETER, "CLIMATE_KNOWLEDGE": CLIMATE_KNOWLEDGE,
         "CLIMATE_POLICIES_ACTIONS": CLIMATE_POLICIES_ACTIONS, "CLIMATE_TRUST": CLIMATE_TRUST,
-        "BIOECONOMY": BIOECONOMY, "MORAL_VALUES": MORAL_VALUES, "ADDITIONAL_VARIABLES": ADDITIONAL_VARIABLES
+        "BIOECONOMY": BIOECONOMY, "MORAL_VALUES": MORAL_VALUES
     }
 
     for featureset in featuresets:
