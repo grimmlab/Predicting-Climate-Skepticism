@@ -20,8 +20,7 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 class Optimizer:
 
-    def __init__(self, experiment: str = None, data: pd.DataFrame = None, save_dir: pathlib.Path = None, dependent_variable: str = None):
-        self.experiment = experiment
+    def __init__(self, data: pd.DataFrame = None, save_dir: pathlib.Path = None, dependent_variable: str = None):
         self.data = data
         self.save_dir = save_dir
         self.dependent_variable = dependent_variable
@@ -116,7 +115,7 @@ class Optimizer:
             self.data, test_size=0.2, random_state=42, stratify=self.data[self.dependent_variable])
 
         study = utils.create_new_study()
-        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=30, show_progress_bar=True)
+        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=1, show_progress_bar=True)
         print(f"Best score: {study.best_trial.value}")
 
         # Move validation results and models of best trial
@@ -140,7 +139,8 @@ class Optimizer:
             w = csv.writer(f)
             w.writerows(study.best_params.items())
 
-        shap_values = self.shap(final_model, train_val, test)
+        # shap_values = self.shap(final_model, train_val, test)
+        shap_values = pd.DataFrame()
 
         with open(self.save_dir.joinpath('score.txt'), 'w') as f:
             if self.dependent_variable != "climate_eb_problem":

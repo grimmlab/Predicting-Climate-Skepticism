@@ -16,8 +16,8 @@ class bcolors:
 
 def run():
     DEPENDENT_VARIABLES = ["climate_eb_problem", "climate_state_manmade", "climate_state_convinced"]
-    EXPERIMENTS = ["PERSONAL_DATA", "MORAL_VALUES", "ECONOMIC_PREFERENCES", "CLIMATE_EUROBAROMETER",
-        "CLIMATE_KNOWLEDGE", "CLIMATE_POLICIES_ACTIONS", "CLIMATE_TRUST", "BIOECONOMY"]
+    EXPERIMENTS = ["DEMOGRAPHICS", "PERSONAL_CONVICTION", "MORAL_FOUNDATIONS", "ECONOMIC_PREFERENCES",
+        "RESPONSIBILITY", "POLICY_ACTIONS", "CLIMATE_OPINION", "PERSONAL_ACTIONS"]
 
     for dependent_variable in DEPENDENT_VARIABLES:
         for experiment in EXPERIMENTS:
@@ -34,7 +34,7 @@ def run():
 
                 data = utils.preprocess_data(save_dir=save_dir, dependent_variable=dependent_variable, featuresets=featuresets, modus=modus)
 
-                optimizer_run = optimizer.Optimizer(experiment=experiment, data=data, save_dir=save_dir, dependent_variable=dependent_variable)
+                optimizer_run = optimizer.Optimizer(data=data, save_dir=save_dir, dependent_variable=dependent_variable)
                 predictions.append(optimizer_run.run_optimization()[0])
                 shap_values.append(optimizer_run.run_optimization()[1])
 
@@ -64,7 +64,7 @@ def run():
 
                     data = utils.preprocess_data(save_dir=save_dir, dependent_variable=dependent_variable, featuresets=featuresets, modus=modus)
 
-                    optimizer_run = optimizer.Optimizer(experiment=experiment, data=data, save_dir=save_dir, dependent_variable=dependent_variable)
+                    optimizer_run = optimizer.Optimizer(data=data,save_dir=save_dir,dependent_variable=dependent_variable)
                     predictions.append(optimizer_run.run_optimization()[0])
                     shap_values.append(optimizer_run.run_optimization()[1])
 
@@ -77,6 +77,31 @@ def run():
                 print(ttest_shap_values)
                 with open(save_dir.parent.joinpath('ttest_shap_values.txt'), 'w') as f:
                     f.write(str(ttest_shap_values))
+
+        featuresets = ["RESPONSIBILITY", "POLICY_ACTIONS", "CLIMATE_OPINION", "PERSONAL_ACTIONS"]
+
+        for modus in ["normal", "hypothesis"]:
+            print(f'{bcolors.HEADER}{dependent_variable, featuresets, modus}{bcolors.ENDC}')
+
+            save_dir = pathlib.Path(f"results/{dependent_variable}/{'#'.join(featuresets)}/{modus}/")
+            save_dir.mkdir(parents=True, exist_ok=True)
+
+            data = utils.preprocess_data(save_dir=save_dir, dependent_variable=dependent_variable,
+                                         featuresets=featuresets, modus=modus)
+
+            optimizer_run = optimizer.Optimizer(data=data, save_dir=save_dir, dependent_variable=dependent_variable)
+            predictions.append(optimizer_run.run_optimization()[0])
+            shap_values.append(optimizer_run.run_optimization()[1])
+
+        ttest_predictions = stats.ttest_ind(predictions[1], predictions[0])
+        print(f"T-Test Predictions: {ttest_predictions}")
+        with open(save_dir.parent.joinpath('ttest_predictions.txt'), 'w') as f:
+            f.write(str(ttest_predictions))
+
+        ttest_shap_values = stats.ttest_ind(shap_values[1].values, shap_values[0].values)
+        print(ttest_shap_values)
+        with open(save_dir.parent.joinpath('ttest_shap_values.txt'), 'w') as f:
+            f.write(str(ttest_shap_values))
 
 if __name__ == "__main__":
 
