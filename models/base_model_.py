@@ -34,7 +34,7 @@ class BaseModel(abc.ABC):
         self.model.fit(x_train, y_train)
 
     def predict(self, X_in: pd.DataFrame) -> np.array:
-        X_in = X_in.drop(self.dependent_variable, axis=1)
+        X_in = X_in.drop(self.dependent_variable, axis=1) if self.dependent_variable in X_in.columns else X_in
         prediction = self.model.predict(X_in)
         return prediction
 

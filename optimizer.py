@@ -108,7 +108,7 @@ class Optimizer:
             f.savefig(self.save_dir.joinpath(f"partial_dependence_plots/shap.partial_dependence_plot_{feature}.pdf"),
                       format='pdf', bbox_inches='tight')
         """
-        return explainer(test)
+        return shap_values
 
     def run_optimization(self):
         train_val, test = sklearn.model_selection.train_test_split(
