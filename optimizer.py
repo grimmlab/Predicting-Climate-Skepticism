@@ -86,8 +86,8 @@ class Optimizer:
             self.save_dir.joinpath('temp', f'unfitted_model_trial {trial_number}').unlink()
 
     def shap(self, final_model, train_val, test):
-        explainer = shap.Explainer(final_model.predict, train_val)
-        shap_values = explainer(test)
+        explainer = shap.Explainer(final_model.predict, train_val.drop(self.dependent_variable, axis=1))
+        shap_values = explainer(test.drop(self.dependent_variable, axis=1))
 
         joblib.dump(explainer, self.save_dir.joinpath('explainer.sav'))
 
@@ -115,7 +115,7 @@ class Optimizer:
             self.data, test_size=0.2, random_state=42, stratify=self.data[self.dependent_variable])
 
         study = utils.create_new_study()
-        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=1, show_progress_bar=True)
+        study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=30, show_progress_bar=True)
         print(f"Best score: {study.best_trial.value}")
 
         # Move validation results and models of best trial
@@ -139,8 +139,7 @@ class Optimizer:
             w = csv.writer(f)
             w.writerows(study.best_params.items())
 
-        # shap_values = self.shap(final_model, train_val, test)
-        shap_values = pd.DataFrame()
+        shap_values = self.shap(final_model, train_val, test)
 
         with open(self.save_dir.joinpath('score.txt'), 'w') as f:
             if self.dependent_variable != "climate_eb_problem":
