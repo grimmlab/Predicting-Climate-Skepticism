@@ -2,6 +2,8 @@ import optimizer
 import utils
 import pathlib
 import scipy.stats as stats
+import os
+import shutil
 
 class bcolors:
     HEADER = '\033[95m'
@@ -18,6 +20,9 @@ def run():
     DEPENDENT_VARIABLES = ["climate_eb_problem", "climate_state_manmade", "climate_state_convinced"]
     EXPERIMENTS = ["DEMOGRAPHICS", "PERSONAL_CONVICTION", "MORAL_FOUNDATIONS", "ECONOMIC_PREFERENCES",
         "RESPONSIBILITY", "POLICY_ACTIONS", "CLIMATE_OPINION", "PERSONAL_ACTIONS"]
+
+    if os.path.isdir("results"):
+        shutil.rmtree("results")
 
     for dependent_variable in DEPENDENT_VARIABLES:
         for experiment in EXPERIMENTS:
