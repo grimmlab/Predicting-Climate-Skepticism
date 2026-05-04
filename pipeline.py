@@ -40,8 +40,9 @@ def run():
                 data = utils.preprocess_data(save_dir=save_dir, dependent_variable=dependent_variable, featuresets=featuresets, modus=modus)
 
                 optimizer_run = optimizer.Optimizer(data=data, save_dir=save_dir, dependent_variable=dependent_variable)
-                predictions.append(optimizer_run.run_optimization()[0])
-                shap_values.append(optimizer_run.run_optimization()[1])
+                preds, shaps = optimizer_run.run_optimization()
+                predictions.append(preds)
+                shap_values.append(shaps)
 
             ttest_predictions = stats.ttest_ind(predictions[1], predictions[0])
             print(f"T-Test Predictions: {ttest_predictions}")
@@ -70,8 +71,9 @@ def run():
                     data = utils.preprocess_data(save_dir=save_dir, dependent_variable=dependent_variable, featuresets=featuresets, modus=modus)
 
                     optimizer_run = optimizer.Optimizer(data=data,save_dir=save_dir,dependent_variable=dependent_variable)
-                    predictions.append(optimizer_run.run_optimization()[0])
-                    shap_values.append(optimizer_run.run_optimization()[1])
+                    preds, shaps = optimizer_run.run_optimization()
+                    predictions.append(preds)
+                    shap_values.append(shaps)
 
                 ttest_predictions = stats.ttest_ind(predictions[1], predictions[0])
                 print(f"T-Test Predictions: {ttest_predictions}")
@@ -85,6 +87,9 @@ def run():
 
         featuresets = ["RESPONSIBILITY", "POLICY_ACTIONS", "CLIMATE_OPINION", "PERSONAL_ACTIONS"]
 
+        predictions = []
+        shap_values = []
+
         for modus in ["normal", "hypothesis"]:
             print(f'{bcolors.HEADER}{dependent_variable, featuresets, modus}{bcolors.ENDC}')
 
@@ -95,8 +100,9 @@ def run():
                                          featuresets=featuresets, modus=modus)
 
             optimizer_run = optimizer.Optimizer(data=data, save_dir=save_dir, dependent_variable=dependent_variable)
-            predictions.append(optimizer_run.run_optimization()[0])
-            shap_values.append(optimizer_run.run_optimization()[1])
+            preds, shaps = optimizer_run.run_optimization()
+            predictions.append(preds)
+            shap_values.append(shaps)
 
         ttest_predictions = stats.ttest_ind(predictions[1], predictions[0])
         print(f"T-Test Predictions: {ttest_predictions}")
