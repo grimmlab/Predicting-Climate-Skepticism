@@ -4,6 +4,7 @@ import pathlib
 import scipy.stats as stats
 import os
 import shutil
+import numpy as np
 
 class bcolors:
     HEADER = '\033[95m'
@@ -44,15 +45,13 @@ def run():
                 predictions.append(preds)
                 shap_values.append(shaps)
 
-            ttest_predictions = stats.ttest_ind(predictions[1], predictions[0])
-            print(f"T-Test Predictions: {ttest_predictions}")
-            with open(save_dir.parent.joinpath('ttest_predictions.txt'), 'w') as f:
-                f.write(str(ttest_predictions))
+            ttest_predictions = stats.ttest_ind(predictions[0], predictions[1], equal_var=False)
+            print(f"T-Test Predictions: {ttest_predictions.pvalue}")
+            np.savetxt(save_dir.parent.joinpath('ttest_predictions.txt'), ttest_predictions.pvalue.reshape(-1, 1))
 
-            ttest_shap_values = stats.ttest_ind(shap_values[1].values, shap_values[0].values)
-            print(ttest_shap_values)
-            with open(save_dir.parent.joinpath('ttest_shap_values.txt'), 'w') as f:
-                f.write(str(ttest_shap_values))
+            ttest_shap_values = stats.ttest_ind(shap_values[0].values, shap_values[1].values, equal_var=False)
+            print(f"T-Test SHAP Values: {ttest_shap_values.pvalue}")
+            np.savetxt(save_dir.parent.joinpath('ttest_shap_values.txt'), ttest_shap_values.pvalue)
 
             if len(featuresets) > 1:
 
@@ -75,15 +74,13 @@ def run():
                     predictions.append(preds)
                     shap_values.append(shaps)
 
-                ttest_predictions = stats.ttest_ind(predictions[1], predictions[0])
-                print(f"T-Test Predictions: {ttest_predictions}")
-                with open(save_dir.parent.joinpath('ttest_predictions.txt'), 'w') as f:
-                    f.write(str(ttest_predictions))
+                ttest_predictions = stats.ttest_ind(predictions[0], predictions[1], equal_var=False)
+                print(f"T-Test Predictions: {ttest_predictions.pvalue}")
+                np.savetxt(save_dir.parent.joinpath('ttest_predictions.txt'), ttest_predictions.pvalue.reshape(-1, 1))
 
-                ttest_shap_values = stats.ttest_ind(shap_values[1].values, shap_values[0].values)
-                print(ttest_shap_values)
-                with open(save_dir.parent.joinpath('ttest_shap_values.txt'), 'w') as f:
-                    f.write(str(ttest_shap_values))
+                ttest_shap_values = stats.ttest_ind(shap_values[0].values, shap_values[1].values, equal_var=False)
+                print(f"T-Test SHAP Values: {ttest_shap_values.pvalue}")
+                np.savetxt(save_dir.parent.joinpath('ttest_shap_values.txt'), ttest_shap_values.pvalue)
 
         featuresets = ["RESPONSIBILITY", "POLICY_ACTIONS", "CLIMATE_OPINION", "PERSONAL_ACTIONS"]
 
@@ -104,15 +101,13 @@ def run():
             predictions.append(preds)
             shap_values.append(shaps)
 
-        ttest_predictions = stats.ttest_ind(predictions[1], predictions[0])
-        print(f"T-Test Predictions: {ttest_predictions}")
-        with open(save_dir.parent.joinpath('ttest_predictions.txt'), 'w') as f:
-            f.write(str(ttest_predictions))
+        ttest_predictions = stats.ttest_ind(predictions[0], predictions[1], equal_var=False)
+        print(f"T-Test Predictions: {ttest_predictions.pvalue}")
+        np.savetxt(save_dir.parent.joinpath('ttest_predictions.txt'), ttest_predictions.pvalue.reshape(-1, 1))
 
-        ttest_shap_values = stats.ttest_ind(shap_values[1].values, shap_values[0].values)
-        print(ttest_shap_values)
-        with open(save_dir.parent.joinpath('ttest_shap_values.txt'), 'w') as f:
-            f.write(str(ttest_shap_values))
+        ttest_shap_values = stats.ttest_ind(shap_values[0].values, shap_values[1].values, equal_var=False)
+        print(f"T-Test SHAP Values: {ttest_shap_values.pvalue}")
+        np.savetxt(save_dir.parent.joinpath('ttest_shap_values.txt'), ttest_shap_values.pvalue)
 
 if __name__ == "__main__":
 
