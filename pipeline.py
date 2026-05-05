@@ -47,11 +47,11 @@ def run():
 
             ttest_predictions = stats.ttest_ind(predictions[0], predictions[1], equal_var=False)
             print(f"T-Test Predictions: {ttest_predictions.pvalue}")
-            np.savetxt(save_dir.parent.joinpath('ttest_predictions.txt'), ttest_predictions.pvalue.reshape(-1, 1))
+            np.savetxt(save_dir.parent.joinpath('ttest_predictions.csv'), ttest_predictions.pvalue.reshape(-1, 1), delimiter=",")
 
             ttest_shap_values = stats.ttest_ind(shap_values[0].values, shap_values[1].values, equal_var=False)
             print(f"T-Test SHAP Values: {ttest_shap_values.pvalue}")
-            np.savetxt(save_dir.parent.joinpath('ttest_shap_values.txt'), ttest_shap_values.pvalue)
+            np.savetxt(save_dir.parent.joinpath('ttest_shap_values.csv'), ttest_shap_values.pvalue, delimiter=",")
 
             if len(featuresets) > 1:
 
@@ -76,11 +76,11 @@ def run():
 
                 ttest_predictions = stats.ttest_ind(predictions[0], predictions[1], equal_var=False)
                 print(f"T-Test Predictions: {ttest_predictions.pvalue}")
-                np.savetxt(save_dir.parent.joinpath('ttest_predictions.txt'), ttest_predictions.pvalue.reshape(-1, 1))
+                np.savetxt(save_dir.parent.joinpath('ttest_predictions.csv'), ttest_predictions.pvalue.reshape(-1, 1), delimiter=",")
 
                 ttest_shap_values = stats.ttest_ind(shap_values[0].values, shap_values[1].values, equal_var=False)
                 print(f"T-Test SHAP Values: {ttest_shap_values.pvalue}")
-                np.savetxt(save_dir.parent.joinpath('ttest_shap_values.txt'), ttest_shap_values.pvalue)
+                np.savetxt(save_dir.parent.joinpath('ttest_shap_values.csv'), ttest_shap_values.pvalue, delimiter=",")
 
         featuresets = ["RESPONSIBILITY", "POLICY_ACTIONS", "CLIMATE_OPINION", "PERSONAL_ACTIONS"]
 
@@ -103,11 +103,11 @@ def run():
 
         ttest_predictions = stats.ttest_ind(predictions[0], predictions[1], equal_var=False)
         print(f"T-Test Predictions: {ttest_predictions.pvalue}")
-        np.savetxt(save_dir.parent.joinpath('ttest_predictions.txt'), ttest_predictions.pvalue.reshape(-1, 1))
+        np.savetxt(save_dir.parent.joinpath('ttest_predictions.csv'), ttest_predictions.pvalue.reshape(-1, 1), delimiter=",")
 
         ttest_shap_values = stats.ttest_ind(shap_values[0].values, shap_values[1].values, equal_var=False)
         print(f"T-Test SHAP Values: {ttest_shap_values.pvalue}")
-        np.savetxt(save_dir.parent.joinpath('ttest_shap_values.txt'), ttest_shap_values.pvalue)
+        np.savetxt(save_dir.parent.joinpath('ttest_shap_values.csv'), ttest_shap_values.pvalue, delimiter=",")
 
 if __name__ == "__main__":
 
