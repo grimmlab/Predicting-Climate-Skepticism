@@ -13,5 +13,5 @@ This repository is developed and maintained by members of the [Bioinformatics la
 Citation
 ---------------------
 **Machine learning predicts climate skepticism and identifies individual driving features with explainable artificial intelligence.** <br />
-J Eiglsperger, M Speckner, A Pondorfer, SJ Goerg,  DG Grimm. <br />
+J Eiglsperger, M Speckner, A Pondorfer,  DG Grimm, SJ Goerg. <br />
 *Currently under review, 2026.* <br />
