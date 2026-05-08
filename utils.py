@@ -273,7 +273,8 @@ def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = Non
     full_data = encode_data(full_data, save_dir, featuresets, dependent_variable)
 
     if modus == "hypothesis":
-        full_data[dependent_variable] = np.random.permutation(full_data[dependent_variable].values)
+        for feature in full_data.columns:
+            full_data[feature] = np.random.permutation(full_data[feature].values)
 
     dataset_dir = pathlib.Path("datasets/preprocessed")
     dataset_dir.mkdir(parents=True, exist_ok=True)
@@ -282,26 +283,26 @@ def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = Non
     return full_data
 
 
-def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None):
-    train_str_imp = pd.DataFrame(train.select_dtypes(include=['O']))
-    test_str_imp = pd.DataFrame(test.select_dtypes(include=['O']))
-    if train.select_dtypes(include=['O']).size > 0:
-        imp_str = sklearn.impute.SimpleImputer(strategy="most_frequent").fit(train.select_dtypes(include=['O']))
-        train_str_imp = pd.DataFrame(imp_str.transform(train_str_imp))
-        test_str_imp = pd.DataFrame(imp_str.transform(test_str_imp))
-        train_str_imp.columns = train.select_dtypes(include=['O']).columns
-        train_str_imp.index = train.index
-        test_str_imp.columns = test.select_dtypes(include=['O']).columns
-        test_str_imp.index = test.index
-
-    num_columns = [x for x in train.columns.tolist() if x not in train.select_dtypes(include=['O']).columns.tolist()]
-    imp_num = sklearn.impute.IterativeImputer(
-        random_state=42, estimator=sklearn.ensemble.HistGradientBoostingRegressor()).fit(train[num_columns])
-    train_num_imp = pd.DataFrame(imp_num.transform(train[num_columns]))
-    test_num_imp = pd.DataFrame(imp_num.transform(test[num_columns]))
-    train_num_imp.columns = train[num_columns].columns
-    train_num_imp.index = train.index
-    test_num_imp.columns = test[num_columns].columns
-    test_num_imp.index = test.index
-
-    return pd.concat([pd.concat([train_num_imp, train_str_imp], axis=1), pd.concat([test_num_imp, test_str_imp], axis=1)])
+# def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None):
+#     train_str_imp = pd.DataFrame(train.select_dtypes(include=['O']))
+#     test_str_imp = pd.DataFrame(test.select_dtypes(include=['O']))
+#     if train.select_dtypes(include=['O']).size > 0:
+#         imp_str = sklearn.impute.SimpleImputer(strategy="most_frequent").fit(train.select_dtypes(include=['O']))
+#         train_str_imp = pd.DataFrame(imp_str.transform(train_str_imp))
+#         test_str_imp = pd.DataFrame(imp_str.transform(test_str_imp))
+#         train_str_imp.columns = train.select_dtypes(include=['O']).columns
+#         train_str_imp.index = train.index
+#         test_str_imp.columns = test.select_dtypes(include=['O']).columns
+#         test_str_imp.index = test.index
+#
+#     num_columns = [x for x in train.columns.tolist() if x not in train.select_dtypes(include=['O']).columns.tolist()]
+#     imp_num = sklearn.impute.IterativeImputer(
+#         random_state=42, estimator=sklearn.ensemble.HistGradientBoostingRegressor()).fit(train[num_columns])
+#     train_num_imp = pd.DataFrame(imp_num.transform(train[num_columns]))
+#     test_num_imp = pd.DataFrame(imp_num.transform(test[num_columns]))
+#     train_num_imp.columns = train[num_columns].columns
+#     train_num_imp.index = train.index
+#     test_num_imp.columns = test[num_columns].columns
+#     test_num_imp.index = test.index
+#
+#     return pd.concat([pd.concat([train_num_imp, train_str_imp], axis=1), pd.concat([test_num_imp, test_str_imp], axis=1)])
