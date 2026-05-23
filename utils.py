@@ -10,6 +10,8 @@ import os
 import inspect
 import importlib
 from sklearn.experimental import enable_iterative_imputer
+import joblib
+import shap
 
 def encode_data(data, save_dir, featuresets, dependent_variable):
 
@@ -191,6 +193,16 @@ def create_new_study() -> optuna.study.Study:
     return study
 
 
+def check_params_for_duplicate(current_params: dict, study) -> bool:
+    past_params = [trial.params for trial in study.trials[:-1]]
+    return current_params in past_params
+
+
+def clean_up_after_exception(trial_number: int, save_dir):
+    if save_dir.joinpath('temp', f'unfitted_model_trial{trial_number}').exists():
+        save_dir.joinpath('temp', f'unfitted_model_trial {trial_number}').unlink()
+
+
 def get_mapping_name_to_class() -> dict:
     files = os.listdir('models')
     modules_mapped = {}
@@ -282,27 +294,34 @@ def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = Non
 
     return full_data
 
+def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None):
+    train_str_imp = pd.DataFrame(train.select_dtypes(include=['O']))
+    test_str_imp = pd.DataFrame(test.select_dtypes(include=['O']))
+    if train.select_dtypes(include=['O']).size > 0:
+        imp_str = sklearn.impute.SimpleImputer(strategy="most_frequent").fit(train.select_dtypes(include=['O']))
+        train_str_imp = pd.DataFrame(imp_str.transform(train_str_imp))
+        test_str_imp = pd.DataFrame(imp_str.transform(test_str_imp))
+        train_str_imp.columns = train.select_dtypes(include=['O']).columns
+        train_str_imp.index = train.index
+        test_str_imp.columns = test.select_dtypes(include=['O']).columns
+        test_str_imp.index = test.index
 
-# def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None):
-#     train_str_imp = pd.DataFrame(train.select_dtypes(include=['O']))
-#     test_str_imp = pd.DataFrame(test.select_dtypes(include=['O']))
-#     if train.select_dtypes(include=['O']).size > 0:
-#         imp_str = sklearn.impute.SimpleImputer(strategy="most_frequent").fit(train.select_dtypes(include=['O']))
-#         train_str_imp = pd.DataFrame(imp_str.transform(train_str_imp))
-#         test_str_imp = pd.DataFrame(imp_str.transform(test_str_imp))
-#         train_str_imp.columns = train.select_dtypes(include=['O']).columns
-#         train_str_imp.index = train.index
-#         test_str_imp.columns = test.select_dtypes(include=['O']).columns
-#         test_str_imp.index = test.index
-#
-#     num_columns = [x for x in train.columns.tolist() if x not in train.select_dtypes(include=['O']).columns.tolist()]
-#     imp_num = sklearn.impute.IterativeImputer(
-#         random_state=42, estimator=sklearn.ensemble.HistGradientBoostingRegressor()).fit(train[num_columns])
-#     train_num_imp = pd.DataFrame(imp_num.transform(train[num_columns]))
-#     test_num_imp = pd.DataFrame(imp_num.transform(test[num_columns]))
-#     train_num_imp.columns = train[num_columns].columns
-#     train_num_imp.index = train.index
-#     test_num_imp.columns = test[num_columns].columns
-#     test_num_imp.index = test.index
-#
-#     return pd.concat([pd.concat([train_num_imp, train_str_imp], axis=1), pd.concat([test_num_imp, test_str_imp], axis=1)])
+    num_columns = [x for x in train.columns.tolist() if x not in train.select_dtypes(include=['O']).columns.tolist()]
+    imp_num = sklearn.impute.IterativeImputer(random_state=42).fit(train[num_columns])
+    train_num_imp = pd.DataFrame(imp_num.transform(train[num_columns]))
+    test_num_imp = pd.DataFrame(imp_num.transform(test[num_columns]))
+    train_num_imp.columns = train[num_columns].columns
+    train_num_imp.index = train.index
+    test_num_imp.columns = test[num_columns].columns
+    test_num_imp.index = test.index
+
+    return pd.concat([train_num_imp, train_str_imp], axis=1), pd.concat([test_num_imp, test_str_imp], axis=1)
+
+def compute_shap(final_model, train_val, test, dependent_variable, save_dir):
+    explainer = shap.Explainer(final_model.predict, train_val.drop(dependent_variable, axis=1))
+    shap_values = explainer(test.drop(dependent_variable, axis=1))
+
+    joblib.dump(explainer, save_dir.joinpath('explainer.sav'))
+
+    joblib.dump(shap_values, save_dir.joinpath('shapvalues.sav'))
+    return shap_values

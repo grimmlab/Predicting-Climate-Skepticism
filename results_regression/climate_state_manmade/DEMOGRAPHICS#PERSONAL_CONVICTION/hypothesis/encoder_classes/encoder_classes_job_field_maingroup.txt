@@ -1,0 +1,6 @@
+['Akademische Berufe' 'Angehörige der regulären Streitkräfte'
+ 'Bediener von Anlagen und Maschinen und Montageberufe'
+ 'Bürokräfte und verwandte Berufe' 'Dienstleistungsberufe und Verkäufer'
+ 'Fachkräfte in Land- und Forstwirtschaft und Fischerei' 'Führungskräfte'
+ 'Handwerks- und verwandte Berufe' 'Hilfsarbeitskräfte'
+ 'Techniker und gleichrangige nichttechnische Berufe' nan]

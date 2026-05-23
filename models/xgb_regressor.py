@@ -1,6 +1,5 @@
 import xgboost
 from models import base_model_
-import sklearn
 import torch
 import abc
 import optuna
