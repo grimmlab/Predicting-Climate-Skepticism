@@ -225,5 +225,5 @@ __marimo__/
 /datasets/preprocessed
 Plots.ipynb
 /models/__pycache__
-datasets/ClimateDeniers.csv
+datasets/ClimateDeniers_short.csv
 /models/__pycache__
