@@ -98,7 +98,7 @@ class Optimizer:
 
         final_model = joblib.load(self.save_dir.joinpath(f'unfitted_model_trial {study.best_trial.number}'))
 
-        train_val, test = utils.impute_data(train_val, test)
+        train_val, test = utils.impute_data(train_val, test, self.dependent_variable)
 
         if self.dependent_variable != "climate_eb_problem":
             sampling = study.best_params["sampling"]

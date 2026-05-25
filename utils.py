@@ -273,7 +273,7 @@ def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = Non
     for featureset in featuresets:
         usecols.extend(experiments_dict[featureset])
 
-    full_data = pd.read_csv("datasets/ClimateDeniers.csv", usecols=usecols)
+    full_data = pd.read_csv("datasets/ClimateDeniers.csv", usecols=usecols, keep_default_na=False, na_values=[""])
     if "DEMOGRAPHICS" in featuresets:
         full_data[["religion_practice"]] = full_data[["religion_practice"]].fillna("Never")
         full_data[["migration_region"]] = full_data[["migration_region"]].fillna(0000)
@@ -333,18 +333,19 @@ def compute_shap(final_model, train_val, test, dependent_variable, save_dir):
 def standardize_data(train, test, dependent_variable):
     column_names = train.columns.tolist()
     num_columns = [x for x in train.columns.tolist() if x not in train.select_dtypes(include=['bool']).columns.tolist()]
-    scaler = sklearn.preprocessing.StandardScaler()
-    scaler = scaler.fit(X=train[num_columns].drop(dependent_variable, axis=1))
-    train = pd.DataFrame(
-        np.concatenate(
-            (scaler.transform(train[num_columns].drop(dependent_variable, axis=1)),
-             train[train.columns.difference(num_columns)].to_numpy(),
-             train[dependent_variable].to_frame().to_numpy()), axis=1),
-        columns=column_names)
-    test = pd.DataFrame(
-        np.concatenate(
-            (scaler.transform(test[num_columns].drop(dependent_variable, axis=1)),
-             test[test.columns.difference(num_columns)].to_numpy(),
-             test[dependent_variable].to_frame().to_numpy()), axis=1),
-        columns=column_names)
+    if len(num_columns) > 1 and dependent_variable in num_columns:
+        scaler = sklearn.preprocessing.StandardScaler()
+        scaler = scaler.fit(X=train[num_columns].drop(dependent_variable, axis=1))
+        train = pd.DataFrame(
+            np.concatenate(
+                (scaler.transform(train[num_columns].drop(dependent_variable, axis=1)),
+                 train[train.columns.difference(num_columns)].to_numpy(),
+                 train[dependent_variable].to_frame().to_numpy()), axis=1),
+            columns=column_names)
+        test = pd.DataFrame(
+            np.concatenate(
+                (scaler.transform(test[num_columns].drop(dependent_variable, axis=1)),
+                 test[test.columns.difference(num_columns)].to_numpy(),
+                 test[dependent_variable].to_frame().to_numpy()), axis=1),
+            columns=column_names)
     return train, test
