@@ -227,4 +227,5 @@ __marimo__/
 Plots.ipynb
 /models/__pycache__
 datasets/ClimateDeniers_short.csv
+datasets/ClimateDeniers.csv
 /models/__pycache__
