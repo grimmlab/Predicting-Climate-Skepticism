@@ -48,7 +48,9 @@ class Optimizer:
 
             train, val = (train_val.iloc[train_indexes[fold]], train_val.iloc[val_indexes[fold]])
 
-            train, val = utils.impute_data(train, val)
+            train, val = utils.impute_data(train, val, self.dependent_variable)
+
+            train, val = utils.standardize_data(train, val, self.dependent_variable)
 
             if self.dependent_variable != "climate_eb_problem":
                 if sampling != None:
@@ -59,13 +61,11 @@ class Optimizer:
                         sampler = imblearn.under_sampling.RandomUnderSampler(sampling_strategy=sampling_strategy,
                                                                              random_state=42)
                     train_X_sampled, train_y_sampled = sampler.fit_resample(
-                        train.drop(self.dependent_variable, axis=1), train[self.dependent_variable]
-                    )
+                        train.drop(self.dependent_variable, axis=1), train[self.dependent_variable])
                     train = pd.concat([train_X_sampled, train_y_sampled], axis=1)
                     train = train.sample(frac=1).reset_index(drop=True)
 
-                model = sm.OLS(exog=train.drop(self.dependent_variable, axis=1),
-                                   endog=train[self.dependent_variable])
+                model = sm.OLS(exog=train.drop(self.dependent_variable, axis=1), endog=train[self.dependent_variable])
             else:
                 model = sm.OLS(exog=train.drop(self.dependent_variable, axis=1), endog=train[self.dependent_variable])
             try:
@@ -103,7 +103,9 @@ class Optimizer:
             shutil.copyfile(file, self.save_dir.joinpath(file.name))
         shutil.rmtree(self.save_dir.joinpath('temp'))
 
-        train_val, test = utils.impute_data(train_val, test)
+        train_val, test = utils.impute_data(train_val, test, self.dependent_variable)
+
+        train_val, test = utils.standardize_data(train_val, test, self.dependent_variable)
 
         if self.dependent_variable != "climate_eb_problem":
             sampling = self.study.best_params["sampling"]
@@ -135,6 +137,7 @@ class Optimizer:
             exog=test.drop(self.dependent_variable, axis=1) if self.dependent_variable in test.columns else test)
 
         final_model.pvalues.to_csv(self.save_dir.joinpath('pvalues.csv'), header=False)
+        final_model.params.to_csv(self.save_dir.joinpath('params.csv'), header=False)
         np.savetxt(self.save_dir.joinpath('predictions.csv'), predictions, delimiter=",")
         test.to_csv(self.save_dir.joinpath('test.csv'))
         with open(self.save_dir.joinpath('best_params.csv'), 'w+') as f:

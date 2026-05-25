@@ -51,14 +51,13 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
             ['Neud', 'Weiß', 'KEIN', 'weiß', 'Gieß', '40Ja', 'Y200', 'Deut', 'nein', 'Acht', 'Gar ', '197q', 'kein',
              'fünf', 'xxxx', '75 J', '10 j', "Germ", "oooo", '000/', "19i8", "Draw", '1ß65', "Oooo", '2oo6'],
             [0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 1970, 0000, 0000, 0000, 0000, 0000, 0000,
-             0000, 0000, 1998, 0000, 1965, 0000, 2006])).astype(int)
-        data["climate_flood_affect"] = data["climate_flood_affect"].replace([2,3], [1,1])
+             0000, 0000, 1998, 0000, 1965, 0000, 2006])).astype(float)
+        data["climate_flood_affect"] = data["climate_flood_affect"].replace([2,3], [1,1]).astype(float)
 
         ## Label encoding
         label_cols_DEMOGRAPHICS = [
             "state", "nuts2", "religion", "migration_b_germany","migration_b_country", "migration_s_germany",
-            "migration_s_country", "job_field_maingroup",
-            "unemployment_rate"]
+            "migration_s_country", "job_field_maingroup", "unemployment_rate"]
         for col in label_cols_DEMOGRAPHICS:
             encoder = LabelEncoder()
             data[col] = (encoder.fit_transform(data[[col]]))
@@ -67,7 +66,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
                 f.write(str(encoder.classes_))
 
         ## one hot encoding
-        data = pd.get_dummies(data, columns=["job", "marital_status", "gender"], dtype=int)
+        data = pd.get_dummies(data, columns=["job", "marital_status", "gender"])
 
     if "PERSONAL_CONVICTION" in featuresets:
         ## Ordinal enconding
@@ -85,12 +84,12 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
 
         ## Replacement of certain values
         data["subject_well_being"] = (
-            data["subject_well_being"].replace(["Completely satisfied", "Not satisfied at all"], [1, 10]).astype(float))
+            data["subject_well_being"].replace(["Completely satisfied", "Not satisfied at all"], [1, 10])).astype(float)
         data["politics_vote"] = data["politics_vote"].replace(["Bündnis 90/Die Grünen", "CDU/CSU"],
                                                               ["Bündnis 90|Die Grünen", "CDU|CSU"])
 
         ## one hot encoding
-        data = pd.get_dummies(data, columns=["politics_vote"], dtype=int)
+        data = pd.get_dummies(data, columns=["politics_vote"])
 
     if "RESPONSIBILITY" in featuresets:
 
@@ -99,8 +98,7 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
             data,
             columns=["climate_eb_resp_nat_gov", "climate_eb_resp_eu", "climate_eb_resp_reg_gov",
                      "climate_eb_resp_industry", "climate_eb_resp_self", "climate_eb_resp_activists",
-                     "climate_eb_resp_other", "climate_eb_resp_nobody", "climate_eb_resp_dont_know"],
-            dtype=int, drop_first=True)
+                     "climate_eb_resp_other", "climate_eb_resp_nobody", "climate_eb_resp_dont_know"], drop_first=True)
 
     if "POLICY_ACTIONS" in featuresets:
 
@@ -294,19 +292,19 @@ def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = Non
 
     return full_data
 
-def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None):
-    train_str_imp = pd.DataFrame(train.select_dtypes(include=['O']))
-    test_str_imp = pd.DataFrame(test.select_dtypes(include=['O']))
-    if train.select_dtypes(include=['O']).size > 0:
-        imp_str = sklearn.impute.SimpleImputer(strategy="most_frequent").fit(train.select_dtypes(include=['O']))
-        train_str_imp = pd.DataFrame(imp_str.transform(train_str_imp))
-        test_str_imp = pd.DataFrame(imp_str.transform(test_str_imp))
-        train_str_imp.columns = train.select_dtypes(include=['O']).columns
+def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None, dependent_variable: str = None):
+    train_str_imp = pd.DataFrame(train.select_dtypes(include=['bool']))
+    test_str_imp = pd.DataFrame(test.select_dtypes(include=['bool']))
+    if train.select_dtypes(include=['bool']).size > 0:
+        imp_str = sklearn.impute.SimpleImputer(strategy="most_frequent").fit(train.select_dtypes(include=['bool']).astype("object"))
+        train_str_imp = pd.DataFrame(imp_str.transform(train_str_imp)).astype('bool')
+        test_str_imp = pd.DataFrame(imp_str.transform(test_str_imp)).astype('bool')
+        train_str_imp.columns = train.select_dtypes(include=['bool']).columns
         train_str_imp.index = train.index
-        test_str_imp.columns = test.select_dtypes(include=['O']).columns
+        test_str_imp.columns = test.select_dtypes(include=['bool']).columns
         test_str_imp.index = test.index
 
-    num_columns = [x for x in train.columns.tolist() if x not in train.select_dtypes(include=['O']).columns.tolist()]
+    num_columns = [x for x in train.columns.tolist() if x not in train.select_dtypes(include=['bool']).columns.tolist()]
     imp_num = sklearn.impute.IterativeImputer(random_state=42).fit(train[num_columns])
     train_num_imp = pd.DataFrame(imp_num.transform(train[num_columns]))
     test_num_imp = pd.DataFrame(imp_num.transform(test[num_columns]))
@@ -315,7 +313,13 @@ def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None):
     test_num_imp.columns = test[num_columns].columns
     test_num_imp.index = test.index
 
-    return pd.concat([train_num_imp, train_str_imp], axis=1), pd.concat([test_num_imp, test_str_imp], axis=1)
+    train = pd.concat([train_num_imp, train_str_imp], axis=1)
+    test = pd.concat([test_num_imp, test_str_imp], axis=1)
+
+    train[dependent_variable] = train.pop(dependent_variable)
+    test[dependent_variable] = test.pop(dependent_variable)
+
+    return train, test
 
 def compute_shap(final_model, train_val, test, dependent_variable, save_dir):
     explainer = shap.Explainer(final_model.predict, train_val.drop(dependent_variable, axis=1))
@@ -325,3 +329,22 @@ def compute_shap(final_model, train_val, test, dependent_variable, save_dir):
 
     joblib.dump(shap_values, save_dir.joinpath('shapvalues.sav'))
     return shap_values
+
+def standardize_data(train, test, dependent_variable):
+    column_names = train.columns.tolist()
+    num_columns = [x for x in train.columns.tolist() if x not in train.select_dtypes(include=['bool']).columns.tolist()]
+    scaler = sklearn.preprocessing.StandardScaler()
+    scaler = scaler.fit(X=train[num_columns].drop(dependent_variable, axis=1))
+    train = pd.DataFrame(
+        np.concatenate(
+            (scaler.transform(train[num_columns].drop(dependent_variable, axis=1)),
+             train[train.columns.difference(num_columns)].to_numpy(),
+             train[dependent_variable].to_frame().to_numpy()), axis=1),
+        columns=column_names)
+    test = pd.DataFrame(
+        np.concatenate(
+            (scaler.transform(test[num_columns].drop(dependent_variable, axis=1)),
+             test[test.columns.difference(num_columns)].to_numpy(),
+             test[dependent_variable].to_frame().to_numpy()), axis=1),
+        columns=column_names)
+    return train, test

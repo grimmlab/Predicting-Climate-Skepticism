@@ -1,1 +1,1 @@
-['Buddhism' 'Christianity' 'Islam' 'Other' nan]
+['Buddhism' 'Christianity' 'Hinduism' 'Islam' 'Judaism' 'Other' nan]
