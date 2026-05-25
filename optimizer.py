@@ -45,7 +45,7 @@ class Optimizer:
                 train_val.iloc[val_indexes[fold]],
             )
 
-            train, val = utils.impute_data(train, val)
+            train, val = utils.impute_data(train, val, self.dependent_variable)
 
             if hasattr(model, 'sampling') and hasattr(model, 'sampling_strategy'):
                 if model.sampling == "over":

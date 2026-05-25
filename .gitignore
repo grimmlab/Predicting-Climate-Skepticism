@@ -221,6 +221,7 @@ __marimo__/
 /__pycache__
 /plots
 /results
+/results_regression
 /models/__pycache__
 /datasets/preprocessed
 Plots.ipynb
