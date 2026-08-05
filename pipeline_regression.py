@@ -22,7 +22,8 @@ class bcolors:
 
 def run():
     DEPENDENT_VARIABLES = ["climate_state_manmade", "climate_eb_problem", "climate_state_convinced"]
-    EXPERIMENTS = ["DEMOGRAPHICS"]
+    EXPERIMENTS = ["DEMOGRAPHICS", "PERSONAL_CONVICTION", "MORAL_FOUNDATIONS", "ECONOMIC_PREFERENCES",
+        "RESPONSIBILITY", "POLICY_ACTIONS", "CLIMATE_OPINION", "PERSONAL_ACTIONS"]
 
     if os.path.isdir("results_regression"):
         shutil.rmtree("results_regression")

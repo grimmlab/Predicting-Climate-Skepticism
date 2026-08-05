@@ -306,12 +306,12 @@ def compute_shap(final_model, train_val, test, dependent_variable, save_dir):
     return shap_values
 
 def standardize_data(train, test, dependent_variable):
-    column_names = train.columns.tolist()
+    column_names = train.columns
+    cat_columns = column_names[train.isin([0, 1]).all()].tolist()
+    column_names = column_names.tolist().copy()
     column_names.remove(dependent_variable)
-    num_columns = ["age","income_section","education","children","religion_practice","migration_region",
-                   "climate_flood_affect","unemployment_rate","patent"]
-    cat_columns = list(set(column_names) - set(num_columns))
-    column_names = num_columns + cat_columns + [dependent_variable]
+    num_columns = list(set(column_names) - set(cat_columns))
+    new_column_names = num_columns + cat_columns + [dependent_variable]
     if len(num_columns) > 1:
         scaler = sklearn.preprocessing.StandardScaler()
         scaler = scaler.fit(X=train[num_columns])
@@ -320,12 +320,12 @@ def standardize_data(train, test, dependent_variable):
                 (scaler.transform(train[num_columns]),
                  train[cat_columns].to_numpy(),
                  train[dependent_variable].to_frame().to_numpy()), axis=1),
-            columns=column_names)
+            columns=new_column_names)
         test = pd.DataFrame(
             np.concatenate(
                 (scaler.transform(test[num_columns]),
                  test[cat_columns].to_numpy(),
                  test[dependent_variable].to_frame().to_numpy()), axis=1),
-            columns=column_names)
+            columns=new_column_names)
     return train, test
 
