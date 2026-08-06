@@ -54,10 +54,11 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
         data["climate_flood_affect"] = data["climate_flood_affect"].replace([2,3], [1,1]).astype(float)
 
         ## one hot encoding
-        data = (
-            pd.get_dummies(data, columns=[
-                "job", "marital_status", "gender", "job_field_maingroup", "religion", "migration_b_germany",
-                "migration_b_country", "migration_s_germany", "migration_s_country", "state", "nuts2"], dtype="int"))
+        data = (pd.get_dummies(data,
+                               columns=["job", "marital_status", "gender", "job_field_maingroup", "religion",
+                                        "migration_b_country", "migration_s_country", "state", "nuts2"], dtype="int"))
+        data = (pd.get_dummies(data,
+                               columns=["migration_b_germany", "migration_s_germany"], dtype="int", drop_first=True))
 
     if "PERSONAL_CONVICTION" in featuresets:
         ## Ordinal enconding
