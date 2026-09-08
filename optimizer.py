@@ -18,17 +18,19 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 class Optimizer:
 
-    def __init__(self, data: pd.DataFrame = None, save_dir: pathlib.Path = None, dependent_variable: str = None):
+    def __init__(self, data: pd.DataFrame = None, save_dir: pathlib.Path = None, dependent_variable: str = None, seed: int = None) -> None:
         self.data = data
         self.save_dir = save_dir
         self.dependent_variable = dependent_variable
         self.folds = 5
+        self.seed = seed
 
     def objective(self, trial: optuna.trial.Trial, train_val):
 
         model_name_task = "xgb_regressor" if self.dependent_variable == "climate_eb_problem" else "xgb_classifier"
 
-        unfitted_model: base_model_.BaseModel = utils.get_mapping_name_to_class()[model_name_task](optuna_trial=trial, dependent_variable=self.dependent_variable)
+        unfitted_model: base_model_.BaseModel = utils.get_mapping_name_to_class()[model_name_task](
+            optuna_trial=trial, dependent_variable=self.dependent_variable)
 
         self.save_dir.joinpath('temp').mkdir(parents=True, exist_ok=True)
         unfitted_model.save_model(path=self.save_dir.joinpath('temp'), filename=f'unfitted_model_trial {trial.number}')
@@ -45,15 +47,15 @@ class Optimizer:
                 train_val.iloc[val_indexes[fold]],
             )
 
-            train, val = utils.impute_data(train, val, self.dependent_variable)
+            train, val = utils.impute_data(train, val)
 
             if hasattr(model, 'sampling') and hasattr(model, 'sampling_strategy'):
                 if model.sampling == "over":
                     sampler = imblearn.over_sampling.RandomOverSampler(
-                        sampling_strategy=model.sampling_strategy, random_state=42)
+                        sampling_strategy=model.sampling_strategy, random_state=self.seed)
                 else:
                     sampler = imblearn.under_sampling.RandomUnderSampler(
-                        sampling_strategy=model.sampling_strategy, random_state=42)
+                        sampling_strategy=model.sampling_strategy, random_state=self.seed)
                 train_X_sampled, train_y_sampled = sampler.fit_resample(
                     train.drop(self.dependent_variable, axis=1), train[self.dependent_variable]
                 )
@@ -82,10 +84,11 @@ class Optimizer:
         return current_val_result
 
     def run_optimization(self):
-        train_val, test = sklearn.model_selection.train_test_split(
-            self.data, test_size=0.2, random_state=42, stratify=self.data[self.dependent_variable])
 
-        study = utils.create_new_study()
+        train_val, test = sklearn.model_selection.train_test_split(
+            self.data, test_size=0.2, random_state=self.seed, stratify=self.data[self.dependent_variable])
+
+        study = utils.create_new_study(seed=self.seed)
         study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=30, show_progress_bar=True)
         print(f"Best score: {study.best_trial.value}")
 
@@ -98,7 +101,7 @@ class Optimizer:
 
         final_model = joblib.load(self.save_dir.joinpath(f'unfitted_model_trial {study.best_trial.number}'))
 
-        train_val, test = utils.impute_data(train_val, test, self.dependent_variable)
+        train_val, test = utils.impute_data(train_val, test)
 
         if self.dependent_variable != "climate_eb_problem":
             sampling = study.best_params["sampling"]
@@ -111,10 +114,10 @@ class Optimizer:
 
                 if sampling == "over":
                     sampler = imblearn.over_sampling.RandomOverSampler(sampling_strategy=sampling_strategy,
-                                                                       random_state=42)
+                                                                       random_state=self.seed)
                 else:
                     sampler = imblearn.under_sampling.RandomUnderSampler(sampling_strategy=sampling_strategy,
-                                                                         random_state=42)
+                                                                         random_state=self.seed)
                 train_val_X_sampled, train_val_y_sampled = sampler.fit_resample(
                     train_val.drop(self.dependent_variable, axis=1), train_val[self.dependent_variable]
                 )
@@ -143,4 +146,4 @@ class Optimizer:
 
         pd.DataFrame(shap_values.values, columns=shap_values.feature_names).to_csv(self.save_dir.joinpath('shap_values.csv'), index=False)
 
-        return predictions, shap_values
+        # return predictions, shap_values

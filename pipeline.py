@@ -30,62 +30,77 @@ def run():
         for experiment in EXPERIMENTS:
             featuresets = EXPERIMENTS[:EXPERIMENTS.index(experiment) + 1]
 
-            predictions = []
-            shap_values = []
+            # predictions = []
+            # shap_values = []
 
-            for modus in ["normal", "hypothesis"]:
-                print(f'{bcolors.HEADER}{dependent_variable, featuresets, modus}{bcolors.ENDC}')
+            for modus in ["normal"]: # , "hypothesis"
 
                 save_dir = pathlib.Path(f"results/{dependent_variable}/{'#'.join(featuresets)}/{modus}/")
                 save_dir.mkdir(parents=True, exist_ok=True)
 
-                data = utils.preprocess_data(save_dir=save_dir, dependent_variable=dependent_variable, featuresets=featuresets, modus=modus)
+                data = utils.preprocess_data(
+                    save_dir=save_dir, dependent_variable=dependent_variable, featuresets=featuresets, modus=modus)
 
-                optimizer_run = optimizer.Optimizer(data=data, save_dir=save_dir, dependent_variable=dependent_variable)
-                preds, shaps = optimizer_run.run_optimization()
-                predictions.append(preds)
-                shap_values.append(shaps)
+                for seed in range(50):
 
-            ttest_predictions = stats.ttest_ind(predictions[0], predictions[1], equal_var=False)
-            print(f"T-Test Predictions: {ttest_predictions.pvalue}")
-            np.savetxt(save_dir.parent.joinpath('ttest_predictions.csv'), ttest_predictions.pvalue.reshape(-1, 1), delimiter=",")
+                    print(f'{bcolors.HEADER}{dependent_variable, featuresets, modus, seed}{bcolors.ENDC}')
 
-            ttest_shap_values = pd.DataFrame(stats.ttest_ind(pd.DataFrame(shap_values[0].values, columns=shap_values[0].feature_names),
-                pd.DataFrame(shap_values[1].values, columns=shap_values[1].feature_names), equal_var=False).pvalue.reshape(1,-1), columns=shap_values[0].feature_names)
-            print(f"T-Test SHAP Values: {ttest_shap_values}")
-            ttest_shap_values.to_csv(save_dir.parent.joinpath('ttest_shap_values.csv'), index=False)
+                    save_dir_seed = save_dir.joinpath(str(seed))
+                    
+                    optimizer_run = optimizer.Optimizer(
+                        data=data, save_dir=save_dir_seed, dependent_variable=dependent_variable, seed=seed)
+                    optimizer_run.run_optimization()
+                    # preds, shaps = optimizer_run.run_optimization()
+            #     predictions.append(preds)
+            #     shap_values.append(shaps)
+            #
+            # ttest_predictions = stats.ttest_ind(predictions[0], predictions[1], equal_var=False)
+            # print(f"T-Test Predictions: {ttest_predictions.pvalue}")
+            # np.savetxt(save_dir.parent.joinpath('ttest_predictions.csv'), ttest_predictions.pvalue.reshape(-1, 1), delimiter=",")
+            #
+            # ttest_shap_values = pd.DataFrame(stats.ttest_ind(pd.DataFrame(shap_values[0].values, columns=shap_values[0].feature_names),
+            #     pd.DataFrame(shap_values[1].values, columns=shap_values[1].feature_names), equal_var=False).pvalue.reshape(1,-1), columns=shap_values[0].feature_names)
+            # print(f"T-Test SHAP Values: {ttest_shap_values}")
+            # ttest_shap_values.to_csv(save_dir.parent.joinpath('ttest_shap_values.csv'), index=False)
 
             if len(featuresets) > 1:
 
-                predictions = []
-                shap_values = []
+                # predictions = []
+                # shap_values = []
 
-                for modus in ["normal", "hypothesis"]:
-
-                    print(f'{bcolors.HEADER}{dependent_variable, featuresets, modus}{bcolors.ENDC}')
+                for modus in ["normal"]: #, "hypothesis"
 
                     save_dir = pathlib.Path(f"results/{dependent_variable}/{experiment}/{modus}/")
                     save_dir.mkdir(parents=True, exist_ok=True)
 
                     featuresets = [experiment]
 
-                    data = utils.preprocess_data(save_dir=save_dir, dependent_variable=dependent_variable, featuresets=featuresets, modus=modus)
+                    data = utils.preprocess_data(
+                        save_dir=save_dir, dependent_variable=dependent_variable, featuresets=featuresets, modus=modus)
 
-                    optimizer_run = optimizer.Optimizer(data=data,save_dir=save_dir,dependent_variable=dependent_variable)
-                    preds, shaps = optimizer_run.run_optimization()
-                    predictions.append(preds)
-                    shap_values.append(shaps)
+                    for seed in range(50):
 
-                ttest_predictions = stats.ttest_ind(predictions[0], predictions[1], equal_var=False)
-                print(f"T-Test Predictions: {ttest_predictions.pvalue}")
-                np.savetxt(save_dir.parent.joinpath('ttest_predictions.csv'), ttest_predictions.pvalue.reshape(-1, 1), delimiter=",")
+                        print(f'{bcolors.HEADER}{dependent_variable, featuresets, modus}{bcolors.ENDC}')
 
-                ttest_shap_values = pd.DataFrame(
-                    stats.ttest_ind(pd.DataFrame(shap_values[0].values, columns=shap_values[0].feature_names),
-                                    pd.DataFrame(shap_values[1].values, columns=shap_values[1].feature_names),
-                                    equal_var=False).pvalue.reshape(1, -1), columns=shap_values[0].feature_names)
-                print(f"T-Test SHAP Values: {ttest_shap_values}")
-                ttest_shap_values.to_csv(save_dir.parent.joinpath('ttest_shap_values.csv'), index=False)
+                        save_dir_seed = save_dir.joinpath(str(seed))
+
+                        optimizer_run = optimizer.Optimizer(
+                            data=data,save_dir=save_dir_seed,dependent_variable=dependent_variable, seed=seed)
+                        optimizer_run.run_optimization()
+                        # preds, shaps = optimizer_run.run_optimization()
+                        # predictions.append(preds)
+                        # shap_values.append(shaps)
+
+                # ttest_predictions = stats.ttest_ind(predictions[0], predictions[1], equal_var=False)
+                # print(f"T-Test Predictions: {ttest_predictions.pvalue}")
+                # np.savetxt(save_dir.parent.joinpath('ttest_predictions.csv'), ttest_predictions.pvalue.reshape(-1, 1), delimiter=",")
+
+                # ttest_shap_values = pd.DataFrame(
+                #     stats.ttest_ind(pd.DataFrame(shap_values[0].values, columns=shap_values[0].feature_names),
+                #                     pd.DataFrame(shap_values[1].values, columns=shap_values[1].feature_names),
+                #                     equal_var=False).pvalue.reshape(1, -1), columns=shap_values[0].feature_names)
+                # print(f"T-Test SHAP Values: {ttest_shap_values}")
+                # ttest_shap_values.to_csv(save_dir.parent.joinpath('ttest_shap_values.csv'), index=False)
 
 if __name__ == "__main__":
 

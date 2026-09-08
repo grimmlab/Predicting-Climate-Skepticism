@@ -1,6 +1,5 @@
 import pathlib
 import numpy as np
-np.random.seed(0)
 from sklearn.preprocessing import OrdinalEncoder, LabelEncoder
 import sklearn
 import datetime
@@ -162,10 +161,13 @@ def encode_data(data, save_dir, featuresets, dependent_variable):
     return data
 
 
-def get_indexes(df: pd.DataFrame, n_splits: int=5, target_column: str=None):
+def get_indexes(df: pd.DataFrame, n_splits: int=5, target_column: str=None, seed: int=None):
     train_indexes = []
     test_indexes = []
-    splitter = sklearn.model_selection.StratifiedKFold(n_splits=n_splits, random_state=42, shuffle=True) if target_column != "climate_eb_problem" else sklearn.model_selection.KFold(n_splits=n_splits, random_state=42, shuffle=True)
+    splitter = (
+        sklearn.model_selection.StratifiedKFold(
+            n_splits=n_splits, random_state=seed, shuffle=True)) if target_column != "climate_eb_problem" else (
+        sklearn.model_selection.KFold(n_splits=n_splits, random_state=seed, shuffle=True))
     X = df.drop(columns=[target_column])
     y = df[target_column]
     for train_index, test_index in splitter.split(X, y):
@@ -175,10 +177,10 @@ def get_indexes(df: pd.DataFrame, n_splits: int=5, target_column: str=None):
     return train_indexes, test_indexes
 
 
-def create_new_study() -> optuna.study.Study:
+def create_new_study(seed) -> optuna.study.Study:
     study_name = (datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
     study = optuna.create_study(
-        study_name=study_name, direction="maximize", sampler=optuna.samplers.TPESampler(seed=42),
+        study_name=study_name, direction="maximize", sampler=optuna.samplers.TPESampler(seed=seed),
         pruner=optuna.pruners.PercentilePruner(percentile=80, n_min_trials=20), load_if_exists=False)
 
     return study
@@ -210,7 +212,9 @@ def get_mapping_name_to_class() -> dict:
     return modules_mapped
 
 
-def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = None, featuresets: list = None, modus: str = None) -> pd.DataFrame:
+def preprocess_data(
+        save_dir: pathlib.Path = None, dependent_variable: str = None, featuresets: list = None, modus: str = None,
+        seed: int = None) -> pd.DataFrame:
 
     usecols = [dependent_variable]
 
@@ -277,7 +281,7 @@ def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = Non
 
     if modus == "hypothesis":
         for feature in full_data.columns:
-            full_data[feature] = np.random.permutation(full_data[feature].values)
+            full_data[feature] = np.random.RandomState(seed=seed).permutation(full_data[feature].values)
 
     dataset_dir = pathlib.Path("datasets/preprocessed")
     dataset_dir.mkdir(parents=True, exist_ok=True)
@@ -285,7 +289,7 @@ def preprocess_data(save_dir: pathlib.Path = None, dependent_variable: str = Non
 
     return full_data
 
-def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None, dependent_variable: str = None):
+def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None):
 
     imputer = sklearn.impute.SimpleImputer(strategy="most_frequent").fit(train)
     train_imp = pd.DataFrame(imputer.transform(train))
