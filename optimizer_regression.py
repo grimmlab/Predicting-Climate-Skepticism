@@ -144,14 +144,8 @@ class Optimizer:
             w = csv.writer(f)
             w.writerows(self.study.best_params.items())
 
-        # shap_values = utils.compute_shap(final_model, train_val, test, dependent_variable=self.dependent_variable, save_dir=self.save_dir)
-
         with open(self.save_dir.joinpath('score.txt'), 'w') as f:
             if self.dependent_variable != "climate_eb_problem":
                 f.write(str(sklearn.metrics.r2_score(y_true=test[self.dependent_variable], y_pred=predictions)))
             else:
                 f.write(str(sklearn.metrics.r2_score(y_true=test[self.dependent_variable], y_pred=predictions)))
-
-        # pd.DataFrame(shap_values.values, columns=shap_values.feature_names).to_csv(self.save_dir.joinpath('shap_values.csv'), index=False)
-
-        return predictions #, shap_values

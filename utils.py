@@ -213,8 +213,7 @@ def get_mapping_name_to_class() -> dict:
 
 
 def preprocess_data(
-        save_dir: pathlib.Path = None, dependent_variable: str = None, featuresets: list = None, modus: str = None,
-        seed: int = None) -> pd.DataFrame:
+        save_dir: pathlib.Path = None, dependent_variable: str = None, featuresets: list = None, seed: int = None) -> pd.DataFrame:
 
     usecols = [dependent_variable]
 
@@ -279,15 +278,12 @@ def preprocess_data(
 
     full_data = encode_data(full_data, save_dir, featuresets, dependent_variable)
 
-    if modus == "hypothesis":
-        for feature in full_data.columns:
-            full_data[feature] = np.random.RandomState(seed=seed).permutation(full_data[feature].values)
-
     dataset_dir = pathlib.Path("datasets/preprocessed")
     dataset_dir.mkdir(parents=True, exist_ok=True)
-    full_data.to_csv(dataset_dir.joinpath(f"{modus}_{dependent_variable}_{''.join(featuresets)}.csv"), index=False)
+    full_data.to_csv(dataset_dir.joinpath(f"{dependent_variable}_{''.join(featuresets)}.csv"), index=False)
 
     return full_data
+
 
 def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None):
 
@@ -301,6 +297,7 @@ def impute_data(train: pd.DataFrame = None, test: pd.DataFrame = None):
 
     return train_imp, test_imp
 
+
 def compute_shap(final_model, train_val, test, dependent_variable, save_dir):
     explainer = shap.Explainer(final_model.predict, train_val.drop(dependent_variable, axis=1))
     shap_values = explainer(test.drop(dependent_variable, axis=1))
@@ -308,7 +305,12 @@ def compute_shap(final_model, train_val, test, dependent_variable, save_dir):
     joblib.dump(explainer, save_dir.joinpath('explainer.sav'))
 
     joblib.dump(shap_values, save_dir.joinpath('shapvalues.sav'))
-    return shap_values
+
+    pd.DataFrame(shap_values.values, columns=shap_values.feature_names).to_csv(
+        save_dir.joinpath('shap_values.csv'), index=False)
+
+    # return shap_values
+
 
 def standardize_data(train, test, dependent_variable):
     column_names = train.columns
