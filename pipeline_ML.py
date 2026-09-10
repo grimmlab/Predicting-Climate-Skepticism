@@ -1,4 +1,4 @@
-import optimizer
+import optimizer_ML
 import utils
 import pathlib
 import os
@@ -29,8 +29,8 @@ def run(DEPENDENT_VARIABLES: list):
 
     for dependent_variable in DEPENDENT_VARIABLES:
 
-        if os.path.isdir(f"results/{dependent_variable}"):
-            shutil.rmtree(f"results/{dependent_variable}")
+        if os.path.isdir(f"results_ML/{dependent_variable}"):
+            shutil.rmtree(f"results_ML/{dependent_variable}")
 
         for experiment in EXPERIMENTS:
             featuresets = experiment.split("#")
@@ -46,7 +46,7 @@ def run(DEPENDENT_VARIABLES: list):
 
                 save_dir_seed = save_dir.joinpath(str(seed))
 
-                optimizer_run = optimizer.Optimizer(
+                optimizer_run = optimizer_ML.Optimizer(
                     data=data, save_dir=save_dir_seed, dependent_variable=dependent_variable, seed=seed)
                 optimizer_run.run_optimization()
 

@@ -86,7 +86,8 @@ class Optimizer:
     def run_optimization(self):
 
         train_val, test = sklearn.model_selection.train_test_split(
-            self.data, test_size=0.2, random_state=self.seed, stratify=self.data[self.dependent_variable])
+            self.data, test_size=0.2, random_state=self.seed,
+            stratify=self.data[self.dependent_variable] if self.dependent_variable != "climate_eb_problem" else None)
 
         study = utils.create_new_study(seed=self.seed)
         study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=30, show_progress_bar=True)
@@ -136,8 +137,12 @@ class Optimizer:
             w = csv.writer(f)
             w.writerows(study.best_params.items())
 
-        if str(self.save_dir).split("/")[-2] in ["DEMOGRAPHICS", "PERSONAL_CONVICTION", "MORAL_FOUNDATIONS", "ECONOMIC_PREFERENCES",
-        "RESPONSIBILITY", "POLICY_ACTIONS", "CLIMATE_OPINION", "PERSONAL_ACTIONS", "DEMOGRAPHICS#PERSONAL_CONVICTION", "DEMOGRAPHICS#PERSONAL_CONVICTION#MORAL_FOUNDATIONS#ECONOMIC_PREFERENCES#RESPONSIBILITY#POLICY_ACTIONS#CLIMATE_OPINION#PERSONAL_ACTIONS"]:
+        if str(self.save_dir).split("/")[-2] in [
+            "DEMOGRAPHICS", "PERSONAL_CONVICTION", "MORAL_FOUNDATIONS", "ECONOMIC_PREFERENCES", "RESPONSIBILITY",
+            "POLICY_ACTIONS", "CLIMATE_OPINION", "PERSONAL_ACTIONS", "DEMOGRAPHICS#PERSONAL_CONVICTION",
+            "DEMOGRAPHICS#PERSONAL_CONVICTION#MORAL_FOUNDATIONS#ECONOMIC_PREFERENCES#RESPONSIBILITY"
+            "DEMOGRAPHICS#PERSONAL_CONVICTION#MORAL_FOUNDATIONS#ECONOMIC_PREFERENCES#RESPONSIBILITY#POLICY_ACTIONS#CLIMATE_OPINION#PERSONAL_ACTIONS"
+        ]:
             utils.compute_shap(final_model, train_val, test, dependent_variable=self.dependent_variable, save_dir=self.save_dir)
 
         with open(self.save_dir.joinpath('score.txt'), 'w') as f:
