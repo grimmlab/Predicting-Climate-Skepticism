@@ -1,17 +1,10 @@
 import warnings
 warnings.filterwarnings('ignore')
 import pathlib
-import scipy.stats as stats
 import os
 import shutil
-import numpy as np
 import utils
 import optimizer_regression
-import pandas as pd
-import random
-
-np.random.seed(42)
-random.seed(42)
 
 class bcolors:
     HEADER = '\033[95m'
@@ -34,17 +27,22 @@ def run():
 
     for dependent_variable in DEPENDENT_VARIABLES:
         for experiment in EXPERIMENTS:
-            featuresets = [experiment]
+            featuresets = experiment.split("#")
 
-            for modus in ["normal"]:
-                print(f'{bcolors.HEADER}{dependent_variable, featuresets, modus}{bcolors.ENDC}')
+            save_dir = pathlib.Path(f"results_regression/{dependent_variable}/{'#'.join(featuresets)}/")
+            save_dir.mkdir(parents=True, exist_ok=True)
 
-                save_dir = pathlib.Path(f"results_regression/{dependent_variable}/{'#'.join(featuresets)}/{modus}/")
-                save_dir.mkdir(parents=True, exist_ok=True)
+            data = utils.preprocess_data(save_dir=save_dir, dependent_variable=dependent_variable,
+                                         featuresets=featuresets)
 
-                data = utils.preprocess_data(save_dir=save_dir, dependent_variable=dependent_variable, featuresets=featuresets, modus=modus)
+            for seed in range(30):
 
-                optimizer_run = optimizer_regression.Optimizer(data=data, save_dir=save_dir, dependent_variable=dependent_variable)
+                print(f'{bcolors.HEADER}{dependent_variable, featuresets, seed}{bcolors.ENDC}')
+
+                save_dir_seed = save_dir.joinpath(str(seed))
+
+                optimizer_run = optimizer_regression.Optimizer(
+                    data=data, save_dir=save_dir_seed, dependent_variable=dependent_variable, seed=seed)
                 optimizer_run.run_optimization()
 
 if __name__ == "__main__":

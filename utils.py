@@ -309,8 +309,6 @@ def compute_shap(final_model, train_val, test, dependent_variable, save_dir):
     pd.DataFrame(shap_values.values, columns=shap_values.feature_names).to_csv(
         save_dir.joinpath('shap_values.csv'), index=False)
 
-    # return shap_values
-
 
 def standardize_data(train, test, dependent_variable):
     column_names = train.columns

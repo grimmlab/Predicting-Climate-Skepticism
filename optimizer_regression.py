@@ -15,11 +15,12 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 class Optimizer:
 
-    def __init__(self, data: pd.DataFrame = None, save_dir: pathlib.Path = None, dependent_variable: str = None):
+    def __init__(self, data: pd.DataFrame = None, save_dir: pathlib.Path = None, dependent_variable: str = None, seed: int = None):
         self.data = data
         self.save_dir = save_dir
         self.dependent_variable = dependent_variable
         self.folds = 5
+        self.seed = seed
 
     def objective(self, trial: optuna.trial.Trial, train_val):
 
@@ -56,10 +57,10 @@ class Optimizer:
                 if sampling != None:
                     if sampling == "over":
                         sampler = imblearn.over_sampling.RandomOverSampler(sampling_strategy=sampling_strategy,
-                                                                           random_state=42)
+                                                                           random_state=self.seed)
                     else:
                         sampler = imblearn.under_sampling.RandomUnderSampler(sampling_strategy=sampling_strategy,
-                                                                             random_state=42)
+                                                                             random_state=self.seed)
                     train_X_sampled, train_y_sampled = sampler.fit_resample(
                         train.drop(self.dependent_variable, axis=1), train[self.dependent_variable])
                     train = pd.concat([train_X_sampled, train_y_sampled], axis=1)
@@ -90,9 +91,9 @@ class Optimizer:
 
     def run_optimization(self):
         train_val, test = sklearn.model_selection.train_test_split(
-            self.data, test_size=0.2, random_state=42, stratify=self.data[self.dependent_variable])
+            self.data, test_size=0.2, random_state=self.seed, stratify=self.data[self.dependent_variable])
 
-        self.study = utils.create_new_study()
+        self.study = utils.create_new_study(seed=self.seed)
         self.study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=30, show_progress_bar=True)
         print(f"Best score: {self.study.best_trial.value}")
 
@@ -118,10 +119,10 @@ class Optimizer:
 
                 if sampling == "over":
                     sampler = imblearn.over_sampling.RandomOverSampler(sampling_strategy=sampling_strategy,
-                                                                       random_state=42)
+                                                                       random_state=self.seed)
                 else:
                     sampler = imblearn.under_sampling.RandomUnderSampler(sampling_strategy=sampling_strategy,
-                                                                         random_state=42)
+                                                                         random_state=self.seed)
                 train_val_X_sampled, train_val_y_sampled = sampler.fit_resample(
                     train_val.drop(self.dependent_variable, axis=1), train_val[self.dependent_variable]
                 )
