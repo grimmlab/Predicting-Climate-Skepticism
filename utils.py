@@ -288,12 +288,12 @@ def preprocess_data(
     if subgroup == "old_age":
         full_data = full_data[full_data['age'] >= full_data['age'].median()]
     if subgroup == "low_income":
-        full_data = full_data[full_data['income_sections'].isin([
+        full_data = full_data[full_data['income_section'].isin([
             '<= 200 EUR', '200 - 300 EUR', '300 - 400 EUR', '400 - 500 EUR', '500 - 625 EUR', '625 - 750 EUR',
             '750 - 875 EUR', '875 - 1000 EUR', '1000 - 1125 EUR', '1125 - 1250 EUR', '1250 - 1375 EUR'
         ])]
     if subgroup == "high_income":
-        full_data = full_data[full_data['income_sections'].isin([
+        full_data = full_data[full_data['income_section'].isin([
             '1375 - 1500 EUR', '1500 - 1750 EUR', '1750 - 2000 EUR', '2000 - 2250 EUR', '2250 - 2500 EUR',
             '2500 - 2750 EUR', '2750 - 3000 EUR', '3000 - 4000 EUR', '4000 - 5000 EUR', '5000 - 7500 EUR', '>=7500 EUR'
         ])]
@@ -302,10 +302,10 @@ def preprocess_data(
     if subgroup == "female":
         full_data = full_data[full_data['gender'] == "Female"]
     if subgroup == "non_academics":
-        full_data = full_data[full_data['income_sections'].isin([
+        full_data = full_data[full_data['education'].isin([
             "No degree", "Hauptschule", "Realschule", "Abitur", "Lehre"])]
     if subgroup == "academics":
-        full_data = full_data[full_data['income_sections'].isin([
+        full_data = full_data[full_data['education'].isin([
             "Hochschule", "Doktor, Habilitation"])]
 
     full_data = encode_data(full_data, save_dir, featuresets, dependent_variable)
