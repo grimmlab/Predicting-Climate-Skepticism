@@ -24,6 +24,8 @@ class Optimizer:
 
     def objective(self, trial: optuna.trial.Trial, train_val):
 
+        self.save_dir.mkdir(parents=True, exist_ok=True)
+
         if self.dependent_variable != "climate_eb_problem":
             sampling = trial.suggest_categorical('sampling', [None, "over", "under"])
             if sampling != None:
@@ -38,8 +40,6 @@ class Optimizer:
             print('Trial params are a duplicate.')
             utils.clean_up_after_exception(trial_number=trial.number, save_dir=self.save_dir)
             raise optuna.exceptions.TrialPruned()
-
-        self.save_dir.joinpath('temp').mkdir(parents=True, exist_ok=True)
 
         objective_values = []
 
@@ -97,13 +97,6 @@ class Optimizer:
         self.study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=30, show_progress_bar=True)
         print(f"Best score: {self.study.best_trial.value}")
 
-        # Move validation results and models of best trial
-        files_to_keep_path = self.save_dir.joinpath('temp', f'*trial {self.study.best_trial.number}*')
-        files_to_keep = pathlib.Path(files_to_keep_path.parent).expanduser().glob(files_to_keep_path.name)
-        for file in files_to_keep:
-            shutil.copyfile(file, self.save_dir.joinpath(file.name))
-        shutil.rmtree(self.save_dir.joinpath('temp'))
-
         train_val, test = utils.impute_data(train_val, test)
 
         train_val, test = utils.standardize_data(train_val, test, self.dependent_variable)
@@ -139,11 +132,6 @@ class Optimizer:
 
         final_model.pvalues.to_csv(self.save_dir.joinpath('pvalues.csv'), header=False)
         final_model.params.to_csv(self.save_dir.joinpath('params.csv'), header=False)
-        np.savetxt(self.save_dir.joinpath('predictions.csv'), predictions, delimiter=",")
-        test.to_csv(self.save_dir.joinpath('test.csv'))
-        with open(self.save_dir.joinpath('best_params.csv'), 'w+') as f:
-            w = csv.writer(f)
-            w.writerows(self.study.best_params.items())
 
         with open(self.save_dir.joinpath('score.txt'), 'w') as f:
             if self.dependent_variable != "climate_eb_problem":

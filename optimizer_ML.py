@@ -93,14 +93,9 @@ class Optimizer:
         study.optimize(lambda trial: self.objective(trial=trial, train_val=train_val), n_trials=30, show_progress_bar=True)
         print(f"Best score: {study.best_trial.value}")
 
-        # Move validation results and models of best trial
-        files_to_keep_path = self.save_dir.joinpath('temp', f'*trial {study.best_trial.number}*')
-        files_to_keep = pathlib.Path(files_to_keep_path.parent).expanduser().glob(files_to_keep_path.name)
-        for file in files_to_keep:
-            shutil.copyfile(file, self.save_dir.joinpath(file.name))
-        shutil.rmtree(self.save_dir.joinpath('temp'))
+        final_model = joblib.load(self.save_dir.joinpath('temp', f'unfitted_model_trial {study.best_trial.number}'))
 
-        final_model = joblib.load(self.save_dir.joinpath(f'unfitted_model_trial {study.best_trial.number}'))
+        shutil.rmtree(self.save_dir.joinpath('temp'))
 
         train_val, test = utils.impute_data(train_val, test)
 
@@ -127,15 +122,7 @@ class Optimizer:
 
         final_model.retrain(train_val)
 
-        joblib.dump(final_model, self.save_dir.joinpath(f'best_model'))
-
         predictions = final_model.predict(test)
-
-        np.savetxt(self.save_dir.joinpath('predictions.csv'), predictions, delimiter=",")
-        test.to_csv(self.save_dir.joinpath('test.csv'))
-        with open(self.save_dir.joinpath('best_params.csv'), 'w+') as f:
-            w = csv.writer(f)
-            w.writerows(study.best_params.items())
 
         if str(self.save_dir).split("/")[-2] in [
             "DEMOGRAPHICS", "PERSONAL_CONVICTION", "MORAL_FOUNDATIONS", "ECONOMIC_PREFERENCES", "RESPONSIBILITY",
