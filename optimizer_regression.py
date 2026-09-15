@@ -43,7 +43,7 @@ class Optimizer:
 
         objective_values = []
 
-        train_indexes, val_indexes = utils.get_indexes(df=train_val, target_column=self.dependent_variable, n_splits=self.folds)
+        train_indexes, val_indexes = utils.get_indexes(df=train_val, target_column=self.dependent_variable, n_splits=self.folds, seed=self.seed)
 
         for fold in range(self.folds):
 
